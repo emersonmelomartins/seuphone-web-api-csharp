@@ -7,18 +7,25 @@ import { GetAllProduct } from "../../services/productService";
 
 import { ProductsContainer } from "./styles";
 import { base64Image } from "../../assets/base64test";
+import { useLoading } from "../../hooks/useLoading";
 
 export function Products() {
   const [products, setProducts] = useState([]);
 
+  const { setLoading } = useLoading();
+
   useEffect(() => {
+    setLoading(true);
     GetAllProduct().then(resp => {
       setProducts(resp.data);
+      setLoading(false);
     },
     (error) => {
       toast.error("Ocorreu um erro ao carregar os produtos!");
+      setLoading(false);
     });
-  }, []);
+  }, [setLoading]);
+
   return (
     <ProductsContainer>
       <h4 className="mt-5">Filtro de Busca</h4>

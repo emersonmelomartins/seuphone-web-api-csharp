@@ -14,7 +14,7 @@ import { formatPrice } from "../../util/formatPrice";
 import { Link } from "react-router-dom";
 
 export function Cart() {
-  const { cart, removeProduct } = useCart();
+  const { cart, removeProduct, updateProductCartQuantity } = useCart();
   const cartSize = cart.length;
 
   const formattedCart = cart.map((product) => ({
@@ -29,6 +29,22 @@ export function Cart() {
       return acc;
     }, 0)
   );
+
+  function handleProductIncrement(product) {
+    const incrementProductCart = {
+      productId: product.id,
+      productQtd: product.cartQuantity + 1,
+    };
+    updateProductCartQuantity(incrementProductCart);
+  }
+
+  function handleProductDecrement(product) {
+    const decrementProductCart = {
+      productId: product.id,
+      productQtd: product.cartQuantity - 1,
+    };
+    updateProductCartQuantity(decrementProductCart);
+  }
 
   function handleRemoveProduct(id) {
     removeProduct(id);
@@ -71,8 +87,8 @@ export function Cart() {
                       <div>
                         <button
                           type="button"
-                          // disabled={product.amount <= 1}
-                          // onClick={() => handleProductDecrement(product)}
+                          disabled={product.cartQuantity <= 1}
+                          onClick={() => handleProductDecrement(product)}
                         >
                           <MdRemoveCircleOutline size={20} />
                         </button>
@@ -83,7 +99,7 @@ export function Cart() {
                         />
                         <button
                           type="button"
-                          // onClick={() => handleProductIncrement(product)}
+                          onClick={() => handleProductIncrement(product)}
                         >
                           <MdAddCircleOutline size={20} />
                         </button>

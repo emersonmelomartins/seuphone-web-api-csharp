@@ -80,6 +80,7 @@ export function CartProvider({ children }) {
   };
 
   const removeProduct = async (productId) => {
+    setLoading(true);
     try {
       const checkProductInCartIndex = cart.findIndex(
         (product) => product.id === productId
@@ -87,6 +88,7 @@ export function CartProvider({ children }) {
 
       if (checkProductInCartIndex === -1) {
         toast.error("O produto a ser removido não foi encontrado.");
+        setLoading(false);
         return;
       }
 
@@ -96,12 +98,53 @@ export function CartProvider({ children }) {
       localStorage.setItem("@Seuphone::cart", JSON.stringify(updatedCart));
     } catch {
       toast.error("Ocorreu um erro ao remover um produto do carrinho.");
+      setLoading(false);
+      return;
+    }
+  };
+
+  const updateProductCartQuantity = async ({productId, productQtd}) => {
+    try {
+      if (productQtd < 1) {
+        toast.error("Ocorreu um erro ao alterar a quantidade de produto");
+        return;
+      }
+
+      const checkProductInCartIndex = cart.findIndex(
+        (product) => product.id === productId
+      );
+
+      if (checkProductInCartIndex === -1) {
+        toast.error("Ocorreu um erro ao alterar a quantidade de produto");
+        return;
+      }
+
+      const product = await GetProduct(productId).then((resp) => resp.data);
+
+      if (productQtd > product.stockQuantity) {
+        toast.error("Quantidade solicitada fora de estoque");
+        return;
+      }
+
+      const updatedCart = cart.map((cartProduct) =>
+        cartProduct.id === productId
+          ? {
+              ...cartProduct,
+              cartQuantity: productQtd,
+            }
+          : cartProduct
+      );
+
+      setCart(updatedCart);
+      localStorage.setItem("@Seuphone::cart", JSON.stringify(updatedCart));
+    } catch {
+      toast.error("Erro na alteração de quantidade do produto");
       return;
     }
   };
 
   return (
-    <CartContext.Provider value={{ cart, addProduct, removeProduct }}>
+    <CartContext.Provider value={{ cart, addProduct, removeProduct, updateProductCartQuantity }}>
       {children}
     </CartContext.Provider>
   );

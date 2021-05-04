@@ -58,11 +58,11 @@ export function Products() {
                   <ul className="list-group">
                     <li className="list-group-item d-flex justify-content-between align-items-center">
                       32GB
-                      <span className="badge badge-primary badge-pill">7</span>
+                      <span className="badge badge-primary badge-pill">1</span>
                     </li>
                     <li className="list-group-item d-flex justify-content-between align-items-center">
                       64GB
-                      <span className="badge badge-primary badge-pill">x</span>
+                      <span className="badge badge-primary badge-pill">1</span>
                     </li>
                     <li className="list-group-item d-flex justify-content-between align-items-center">
                       128GB
@@ -97,11 +97,11 @@ export function Products() {
                   <ul className="list-group">
                     <li className="list-group-item d-flex justify-content-between align-items-center">
                       Dourado
-                      <span className="badge badge-primary badge-pill">7</span>
+                      <span className="badge badge-primary badge-pill">1</span>
                     </li>
                     <li className="list-group-item d-flex justify-content-between align-items-center">
                       Verde
-                      <span className="badge badge-primary badge-pill">x</span>
+                      <span className="badge badge-primary badge-pill">1</span>
                     </li>
                     <li className="list-group-item d-flex justify-content-between align-items-center">
                       Space Gray
@@ -136,11 +136,11 @@ export function Products() {
                   <ul className="list-group">
                     <li className="list-group-item d-flex justify-content-between align-items-center">
                       iPhone 7
-                      <span className="badge badge-primary badge-pill">7</span>
+                      <span className="badge badge-primary badge-pill">1</span>
                     </li>
                     <li className="list-group-item d-flex justify-content-between align-items-center">
                       iPhone XR
-                      <span className="badge badge-primary badge-pill">x</span>
+                      <span className="badge badge-primary badge-pill">1</span>
                     </li>
                     <li className="list-group-item d-flex justify-content-between align-items-center">
                       iPhone 12

@@ -7,13 +7,10 @@ export const ProductCardContainer = styled.div`
     color: #222
   }
 
-  .panel-body p:first-of-type {
+  .panel-body p:first-of-type, .panel-body p:first-of-type + p {
     color: rgb(146, 146, 146);
     font-size: 12px;
-  }
-  .panel-body p:nth-child(1) {
-    color: #222; 
-    font-size: 14px;
+    line-height: 8px;
   }
 
   .panel-body a:last-child {

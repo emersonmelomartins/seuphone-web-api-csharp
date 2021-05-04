@@ -21,7 +21,6 @@ export function Header() {
         <div className="container">
           <Navbar.Brand>
             <img src={logoImg} width="90px" alt="" />
-
             <Navbar.Toggle />
           </Navbar.Brand>
 

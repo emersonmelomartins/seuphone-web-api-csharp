@@ -1,43 +1,49 @@
-import React, { createContext, useContext, useState } from 'react';
-import { toast } from 'react-toastify';
+import React, { createContext, useContext, useState } from "react";
+import { toast } from "react-toastify";
 
-import { GetProduct } from '../services/productService';
+import { GetProduct } from "../services/productService";
+import { useLoading } from "./useLoading";
 
 const CartContext = createContext({});
 
-export function CartProvider({children}) {
+export function CartProvider({ children }) {
   const [cart, setCart] = useState(() => {
     const storagedCart = localStorage.getItem("@Seuphone::cart");
 
-    if(storagedCart) {
+    if (storagedCart) {
       return JSON.parse(storagedCart);
     }
 
     return [];
   });
 
-    const addProduct = async (productId, productQtd) => {
-      
+  const { setLoading } = useLoading();
 
+  const addProduct = async (productId, productQtd) => {
+    setLoading(true);
     try {
       const checkProductInCart = cart.find(
         (product) => product.id === productId
       );
 
       // Verifica se produto já ta no carrinho
-      if(!checkProductInCart) {
+      if (!checkProductInCart) {
         const product = await GetProduct(productId).then((resp) => resp.data);
 
         // Verifica se produto possui estoque
-        if(product.stockQuantity > 0 && product.stockQuantity >= productQtd) {
-
-          setCart([...cart, { ...product, cartQuantity: productQtd }])
-          localStorage.setItem("@Seuphone::cart", JSON.stringify([...cart, { ...product, cartQuantity: productQtd }]));
+        if (product.stockQuantity > 0 && product.stockQuantity >= productQtd) {
+          setCart([...cart, { ...product, cartQuantity: productQtd }]);
+          localStorage.setItem(
+            "@Seuphone::cart",
+            JSON.stringify([...cart, { ...product, cartQuantity: productQtd }])
+          );
 
           toast.success("Produto adicionado ao carrinho com sucesso!");
+          setLoading(false);
           return;
         } else {
           toast.error("Quantidade solicitada fora de estoque");
+          setLoading(false);
         }
       }
 
@@ -57,19 +63,19 @@ export function CartProvider({children}) {
           );
 
           setCart(updatedCart);
-          localStorage.setItem(
-            "@Seuphone::cart",
-            JSON.stringify(updatedCart)
-          );
-          return;
+          localStorage.setItem("@Seuphone::cart", JSON.stringify(updatedCart));
 
+          toast.success("Produto adicionado ao carrinho com sucesso!");
+          setLoading(false);
+          return;
         } else {
           toast.error("Quantidade solicitada fora de estoque");
+          setLoading(false);
         }
       }
-
     } catch {
       toast.error("Ocorreu um erro ao adicionar produto ao carrinho.");
+      setLoading(false);
     }
   };
 
@@ -88,19 +94,17 @@ export function CartProvider({children}) {
 
       setCart(updatedCart);
       localStorage.setItem("@Seuphone::cart", JSON.stringify(updatedCart));
-
     } catch {
       toast.error("Ocorreu um erro ao remover um produto do carrinho.");
       return;
     }
-  }
-
+  };
 
   return (
     <CartContext.Provider value={{ cart, addProduct, removeProduct }}>
       {children}
     </CartContext.Provider>
-  )
+  );
 }
 
 export function useCart() {

@@ -20,6 +20,7 @@ export function ProductCard({ product, productQtd }) {
             <h5>{product.model}</h5>
           </Link>
           <p>{product.description}</p>
+          <p>{product.stockQuantity} unidade(s) disponível(eis)</p>
           <p>
             {formatPrice(product.price)}
           </p>

@@ -50,9 +50,16 @@ export function CartProvider({ children }) {
       // Se o produto existir no carrinho
       if (checkProductInCart) {
         const product = await GetProduct(productId).then((resp) => resp.data);
+                  console.log({
+            productStock: product.stockQuantity,
+            cartStock: checkProductInCart.cartQuantity,
+            quantityWanted: productQtd
+          })
 
         // Se o estoque for maior que a quantidade desejada
-        if (product.stockQuantity > checkProductInCart.cartQuantity) {
+        if ((productQtd === 1 && product.stockQuantity > checkProductInCart.cartQuantity) 
+        || (productQtd > 1 && product.stockQuantity > productQtd && product.stockQuantity > checkProductInCart.cartQuantity)) {
+
           const updatedCart = cart.map((cartProduct) =>
             cartProduct.id === productId
               ? {
@@ -80,7 +87,6 @@ export function CartProvider({ children }) {
   };
 
   const removeProduct = async (productId) => {
-    setLoading(true);
     try {
       const checkProductInCartIndex = cart.findIndex(
         (product) => product.id === productId
@@ -88,7 +94,6 @@ export function CartProvider({ children }) {
 
       if (checkProductInCartIndex === -1) {
         toast.error("O produto a ser removido não foi encontrado.");
-        setLoading(false);
         return;
       }
 
@@ -98,7 +103,6 @@ export function CartProvider({ children }) {
       localStorage.setItem("@Seuphone::cart", JSON.stringify(updatedCart));
     } catch {
       toast.error("Ocorreu um erro ao remover um produto do carrinho.");
-      setLoading(false);
       return;
     }
   };

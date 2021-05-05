@@ -50,11 +50,6 @@ export function CartProvider({ children }) {
       // Se o produto existir no carrinho
       if (checkProductInCart) {
         const product = await GetProduct(productId).then((resp) => resp.data);
-                  console.log({
-            productStock: product.stockQuantity,
-            cartStock: checkProductInCart.cartQuantity,
-            quantityWanted: productQtd
-          })
 
         // Se o estoque for maior que a quantidade desejada
         if ((productQtd === 1 && product.stockQuantity > checkProductInCart.cartQuantity) 

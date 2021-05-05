@@ -1,30 +1,23 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "react-toastify";
-import { UserAuthenticate } from "../../services/userService";
 import { LoginContainer } from "./styles";
 
-import { decode } from 'jsonwebtoken';
+import { useAuth } from "../../hooks/useAuth";
+import { useHistory } from "react-router";
 
 export function Login() {
 
   const { register, getValues } = useForm();
+  const history = useHistory();
+  const { Authenticate, signed } = useAuth();
 
+  useEffect(() => {
+    signed && history.push("/");
+  }, []);
 
   function handleSubmit() {
     const form = getValues();
-    console.log(form);
-
-    UserAuthenticate(form).then(resp => {
-      const { data } = resp;
-      toast.success("Usuário autenticado, redirecionando para página inicial");
-      localStorage.setItem("@Seuphone::token", data);
-      localStorage.setItem("Seuphone::user", JSON.stringify(decode(data)));
-    },
-    (error) => {
-      const erro = error.response.data;
-      toast.error(erro);
-    })
+    Authenticate(form);
   }
   return (
     <LoginContainer>

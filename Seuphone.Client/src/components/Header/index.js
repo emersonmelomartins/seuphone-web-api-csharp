@@ -5,10 +5,13 @@ import { FiSearch, FiShoppingCart } from "react-icons/fi";
 import { Cart, HeaderContainer } from "./styles";
 import logoImg from "../../assets/img/logo.png";
 import { useCart } from "../../hooks/useCart";
-import { Nav, Navbar } from "react-bootstrap";
+import { Button, Nav, Navbar, Dropdown } from "react-bootstrap";
+import { useAuth } from "../../hooks/useAuth";
 
 export function Header() {
   const { cart } = useCart();
+  const { signed, Logout, user } = useAuth();
+
   const cartSize = cart.length;
 
   return (
@@ -39,12 +42,29 @@ export function Header() {
             </button>
           </form>
 
-          <Link
-            className="btn btn-rounded-seuphone btn-seuphone-outline-white"
-            to="/login"
-          >
-            Entrar / Registrar
-          </Link>
+          {signed ? (
+            <Dropdown>
+              <Dropdown.Toggle className="btn btn-rounded-seuphone btn-seuphone-outline-white">
+                Bem vindo, {user.decodedToken.unique_name.split(" ")[0]}
+              </Dropdown.Toggle>
+
+              <Dropdown.Menu>
+                <Dropdown.Item as={Link} to="/profile">
+                  Meus Dados
+                </Dropdown.Item>
+                <Dropdown.Item as={Button} onClick={Logout}>
+                  Sair
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+          ) : (
+            <Link
+              className="btn btn-rounded-seuphone btn-seuphone-outline-white"
+              to="/login"
+            >
+              Entrar / Registrar
+            </Link>
+          )}
 
           <Cart to="/cart" className="mx-3">
             <FiShoppingCart size={30} color="#FFF" />

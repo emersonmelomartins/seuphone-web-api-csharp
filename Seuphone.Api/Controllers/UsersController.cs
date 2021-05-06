@@ -54,6 +54,9 @@ namespace Seuphone.Api.Controllers
                 return NotFound();
             }
 
+            user.Password = null;
+            user.Token = null;
+
             return user;
         }
 

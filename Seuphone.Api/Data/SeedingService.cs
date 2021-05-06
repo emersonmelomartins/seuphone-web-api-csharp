@@ -29,11 +29,11 @@ namespace Seuphone.Api.Data
             }
 
             // Seeding database automatically for testing purposes
-            User u1 = new User(new int(), "bob.brown@gmail.com", "654321",
+            User u1 = new User(new int(), "bob.brown@gmail.com", "654321", "654321",
                 "Bob Brown", 'M', new DateTime(1980, 01, 03), "123.456.789-10", "09112-000",
                 "Av. Sila Nalon Gonzaga", 123, "Parque Marajoara", "Santo André", "SP");
 
-            User u2 = new User(new int(), "m_green@gmail.com", "123456",
+            User u2 = new User(new int(), "m_green@gmail.com", "123456", "123456",
                 "Maria Green", 'F', new DateTime(1991, 05, 15), "321.123.213-02", "09360-490",
                 "Av. Caetano Scila", 123, "Vila Assis Brasil", "Mauá", "SP");
 

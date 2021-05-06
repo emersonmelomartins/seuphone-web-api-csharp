@@ -73,8 +73,10 @@ _[Ss]cripts
 *.nupkg
 *.ncrunchsolution
 *.dot[Cc]over
+
 *.mdf
 *.ldf
 Seuphone.Client/node_modules
+Seuphone.Client/build
 node_modules
 connectionString.txt

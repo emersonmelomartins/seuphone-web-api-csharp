@@ -12,18 +12,21 @@ namespace Seuphone.Api.Models
     {
         [Key]
         public int Id { get; set; }
-        //[Required]
+        [Required]
+        [Index(IsUnique = true)]
         public string Email { get; set; }
-        //[Required]
+        [Required]
         public string Password { get; set; }
-        //[Required]
-        //[Compare("Password")]
-        //public string ConfirmPassword { get; set; }
+        [Required]
+        [Compare("Password", ErrorMessage = "As senhas não coincidem.")]
+        public string ConfirmPassword { get; set; }
         public string Token { get; set; }
 
         public string Name { get; set; }
         public char Genre { get; set; }
         public DateTime BirthDate { get; set; }
+        [Required]
+        [Index(IsUnique = true)]
         public string CPF { get; set; }
 
         public string ZipCode { get; set; }
@@ -36,11 +39,12 @@ namespace Seuphone.Api.Models
 
         public User() { }
 
-        public User(int id, string email, string password, string name, char genre, DateTime birthDate, string cPF, string zipCode, string address, int houseNumber, string district, string city, string state)
+        public User(int id, string email, string password, string confirmPassword, string name, char genre, DateTime birthDate, string cPF, string zipCode, string address, int houseNumber, string district, string city, string state)
         {
             Id = id;
             Email = email;
             Password = password;
+            ConfirmPassword = confirmPassword;
             Name = name;
             Genre = genre;
             BirthDate = birthDate;

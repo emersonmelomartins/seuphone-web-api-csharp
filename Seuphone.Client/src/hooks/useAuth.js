@@ -1,10 +1,9 @@
 import { decode } from "jsonwebtoken";
 import { createContext, useContext, useState } from "react";
-import { Redirect, useHistory } from "react-router";
+import { useHistory } from "react-router";
 import { toast } from "react-toastify";
-import { Routes } from "../routes";
 import api from "../services/api";
-import { UserAuthenticate, GetUser } from "../services/userService";
+import { UserAuthenticate } from "../services/userService";
 
 const AuthContext = createContext({});
 
@@ -23,10 +22,6 @@ export function AuthProvider({ children }) {
   });
 
   function Authenticate(form) {
-    form = {
-      email: "bob.brown@gmail.com",
-      password: "654321",
-    };
     UserAuthenticate(form).then(
       (resp) => {
         const token = resp.data;
@@ -62,6 +57,7 @@ export function AuthProvider({ children }) {
     setUser(null);
     localStorage.removeItem("@Seuphone::user");
     localStorage.removeItem("@Seuphone::token");
+    history.push("/login");
   }
 
   return (

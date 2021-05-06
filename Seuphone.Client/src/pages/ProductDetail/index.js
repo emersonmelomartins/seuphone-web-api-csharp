@@ -5,6 +5,8 @@ import { GetProduct } from "../../services/productService";
 
 import { base64Image } from "../../assets/base64test";
 import { useCart } from "../../hooks/useCart";
+import { toast } from "react-toastify";
+import { useLoading } from "../../hooks/useLoading";
 
 export function ProductDetail() {
   const { id } = useParams();
@@ -13,15 +15,22 @@ export function ProductDetail() {
   const [qtd, setQtd] = useState(1);
 
   const { addProduct } = useCart();
+  const { setLoading } = useLoading();
 
   useEffect(() => {
+    setLoading(true);
     GetProduct(id).then((resp) => {
       setProduct({
         ...resp.data,
         price: resp.data.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
       });
+      setLoading(false);
+    },
+    (error) => {
+      toast.error("Não foi possível obter os dados deste produto.");
+      setLoading(false);
     });
-  }, [id]);
+  }, [id, setLoading]);
 
   const handleAddProduct = (id, productQtd) => {
     addProduct(id, productQtd);

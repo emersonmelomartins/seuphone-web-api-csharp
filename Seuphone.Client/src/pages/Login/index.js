@@ -4,16 +4,16 @@ import { LoginContainer } from "./styles";
 
 import { useAuth } from "../../hooks/useAuth";
 import { useHistory } from "react-router";
+import { Alert } from "react-bootstrap";
 
 export function Login() {
-
   const { register, getValues } = useForm();
   const history = useHistory();
   const { Authenticate, signed } = useAuth();
 
   useEffect(() => {
     signed && history.push("/");
-  }, []);
+  }, [history, signed]);
 
   function handleSubmit() {
     const form = getValues();
@@ -40,8 +40,8 @@ export function Login() {
           <div className="form-group">
             <label htmlFor="password">Senha</label>
             <input
-            defaultValue=""
-            {...register("password")}
+              defaultValue=""
+              {...register("password")}
               type="password"
               className="form-control"
               name="password"
@@ -49,7 +49,13 @@ export function Login() {
               placeholder="*******"
             />
           </div>
-          {/* POSSÍVEL "LEMBRAR LOGIN" */}
+          <Alert variant="success">
+            <p>Usuário para testes</p>
+            <span>Login: bob.brown@gmail.com</span>
+            <br />
+            <span>Senha: 654321</span>
+          </Alert>
+          {/* POSSÍVEL FUNÇÃO "LEMBRAR LOGIN" */}
           {/* <div className="form-check">
             <input type="checkbox" className="form-check-input" id="exampleCheck1" />
           <label className="form-check-label" htmlFor="exampleCheck1">Check me out</label>
@@ -58,11 +64,11 @@ export function Login() {
             <li>
               <a href="/register">Novo cadastro</a>
             </li>
-            {/* <li>
+            <li>
               <a href="/">Esqueci minha senha</a>
-            </li> */}
+            </li>
           </ul>
-          <div id="result-message-container"></div>
+
           <button
             type="button"
             className="btn btn-seuphone-outline-black btn-block btn-rounded-seuphone"

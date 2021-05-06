@@ -1,14 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
-
-import { RegisterContainer } from "./styles";
 import axios from "axios";
+import { toast } from "react-toastify";
+import { RegisterContainer } from "./styles";
+
+import { CreateUser } from "../../services/userService";
 
 export function Register() {
-  const { register, getValues, setValue } = useForm();
+  const { register, setValue, handleSubmit, watch } = useForm();
 
-  async function pesquisacep(event) {
+  const [validationState, setValidationState] = useState([]);
+
+  async function viacepSearch(event) {
     const valor = event.target.value;
     var cep = valor.replace(/\D/g, "");
 
@@ -29,7 +33,115 @@ export function Register() {
         setValue("city", viacep.localidade);
         setValue("district", viacep.bairro);
         setValue("address", viacep.logradouro);
+      } else {
+        toast.error("Cep inválido!");
       }
+    }
+  }
+
+  const validationBeforeCreate = () => {
+    let form = watch();
+    let hasError = false;
+    let validationState = {};
+
+    if (form.email === undefined || form.email === null || form.email === "") {
+      hasError = true;
+      validationState.email = "error";
+      toast.error("Você precisa informar o e-mail.");
+    }
+
+    if (
+      form.password === undefined ||
+      form.password === null ||
+      form.password === ""
+    ) {
+      hasError = true;
+      validationState.password = "error";
+      toast.error("Você precisa informar a senha.");
+    }
+
+    if (form.name === undefined || form.name === null || form.name === "") {
+      hasError = true;
+      validationState.name = "error";
+      toast.error("Você precisa informar o nome.");
+    }
+
+    if (form.cpf === undefined || form.cpf === null || form.cpf === "") {
+      hasError = true;
+      validationState.cpf = "error";
+      toast.error("Você precisa informar o cpf.");
+    }
+
+    if (
+      form.birthdate === undefined ||
+      form.birthdate === null ||
+      form.birthdate === ""
+    ) {
+      hasError = true;
+      validationState.birthdate = "error";
+      toast.error("Você precisa informar a data de nascimento.");
+    }
+
+    if (
+      form.zipcode === undefined ||
+      form.zipcode === null ||
+      form.zipcode === ""
+    ) {
+      hasError = true;
+      validationState.zipcode = "error";
+      toast.error("Você precisa informar o cep.");
+    }
+
+    if (
+      form.address === undefined ||
+      form.address === null ||
+      form.address === ""
+    ) {
+      hasError = true;
+      validationState.address = "error";
+      toast.error("Você precisa informar o logradouro.");
+    }
+
+    if (
+      form.district === undefined ||
+      form.district === null ||
+      form.district === ""
+    ) {
+      hasError = true;
+      validationState.district = "error";
+      toast.error("Você precisa informar o bairro.");
+    }
+
+    if (form.city === undefined || form.city === null || form.city === "") {
+      hasError = true;
+      validationState.city = "error";
+      toast.error("Você precisa informar a cidade.");
+    }
+
+    if (form.state === undefined || form.state === null || form.state === "") {
+      hasError = true;
+      validationState.state = "error";
+      toast.error("Você precisa informar o estado.");
+    }
+
+    setValidationState(validationState);
+    return hasError;
+  };
+
+  const createNewUser = (form) => {
+    CreateUser(form).then(
+      (resp) => {
+        toast.success("Usuário criado com sucesso!");
+      },
+      (error) => {
+        toast.error(error.response.data.title);
+      }
+    );
+  };
+
+  function onSubmit(form) {
+    if (!validationBeforeCreate()) {
+      createNewUser(form);
     }
   }
 
@@ -37,33 +149,67 @@ export function Register() {
     <RegisterContainer>
       <div className="empty-container seuphone-background"></div>
       <div className="container py-5">
-        <form className="bg-light p-5 mx-auto">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="bg-light p-5 mx-auto"
+        >
           <h1 className="py-2 text-uppercase">Novo Cadastro</h1>
 
           <br />
           <h4>Informações de Login</h4>
           <div className="form-row">
             <div className="form-group col-md-6">
-              <label htmlFor="input-email">E-mail</label>
+              <label htmlFor="email">E-mail</label>
               <input
                 {...register("email")}
                 type="email"
                 className="form-control"
-                id="input-email"
+                id="email"
+                name="email"
                 placeholder="Ex: seuemail@email.com"
+                style={
+                  validationState.email !== undefined
+                    ? { border: "1px solid red" }
+                    : {}
+                }
               />
             </div>
           </div>
 
           <div className="form-row">
             <div className="form-group col-md-6">
-              <label htmlFor="input-password">Senha</label>
+              <label htmlFor="password">Senha</label>
               <input
                 {...register("password")}
                 type="password"
                 className="form-control"
-                id="input-password"
+                id="password"
+                name="password"
                 placeholder="*******"
+                style={
+                  validationState.password !== undefined
+                    ? { border: "1px solid red" }
+                    : {}
+                }
+              />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group col-md-6">
+              <label htmlFor="confirmPassword">Confirmar Senha</label>
+              <input
+                {...register("confirmPassword")}
+                type="password"
+                className="form-control"
+                id="confirmPassword"
+                name="confirmPassword"
+                placeholder="*******"
+                style={
+                  validationState.confirmPassword !== undefined
+                    ? { border: "1px solid red" }
+                    : {}
+                }
               />
             </div>
           </div>
@@ -72,21 +218,32 @@ export function Register() {
           <h4>Informações Pessoais</h4>
           <div className="form-row">
             <div className="form-group col-md-6">
-              <label htmlFor="input-name">Nome Completo</label>
+              <label htmlFor="name">Nome Completo</label>
               <input
                 {...register("name")}
                 type="text"
                 className="form-control"
-                id="input-name"
+                id="name"
+                name="name"
                 placeholder="Ex: João da Silva"
+                style={
+                  validationState.name !== undefined
+                    ? { border: "1px solid red" }
+                    : {}
+                }
               />
             </div>
           </div>
 
           <div className="form-row">
             <div className="form-group col-md-4">
-              <label htmlFor="input-genre">Sexo</label>
-              <select id="input-genre" className="form-control">
+              <label htmlFor="genre">Sexo</label>
+              <select
+                id="genre"
+                name="genre"
+                {...register("genre")}
+                className="form-control"
+              >
                 <option value="">Selecione o sexo...</option>
                 <option value="M">Masculino</option>
                 <option value="F">Feminino</option>
@@ -97,25 +254,37 @@ export function Register() {
 
           <div className="form-row">
             <div className="form-group col-md-4">
-              <label htmlFor="input-cpf">CPF</label>
+              <label htmlFor="cpf">CPF</label>
               <input
                 {...register("cpf")}
                 type="text"
                 className="form-control"
-                id="input-cpf"
+                id="cpf"
+                name="cpf"
                 placeholder="Ex: 123.456.789-10"
+                style={
+                  validationState.cpf !== undefined
+                    ? { border: "1px solid red" }
+                    : {}
+                }
               />
             </div>
           </div>
 
           <div className="form-row">
             <div className="form-group col-md-4">
-              <label htmlFor="input-date">Data de Nascimento</label>
+              <label htmlFor="birthdate">Data de Nascimento</label>
               <input
                 {...register("birthdate")}
                 type="date"
                 className="form-control"
-                id="input-date"
+                id="birthdate"
+                name="birthdate"
+                style={
+                  validationState.birthdate !== undefined
+                    ? { border: "1px solid red" }
+                    : {}
+                }
               />
             </div>
           </div>
@@ -124,62 +293,96 @@ export function Register() {
           <h4>Endereço</h4>
           <div className="form-row">
             <div className="form-group col-md-4">
-              <label htmlFor="input-zipcode">CEP</label>
+              <label htmlFor="zipcode">CEP</label>
               <input
                 {...register("zipcode")}
                 type="text"
                 className="form-control"
-                id="input-zipcode"
+                id="zipcode"
+                name="zipcode"
                 size="10"
                 maxLength="9"
                 defaultValue=""
                 placeholder="Ex: 09112-000"
-                onBlur={pesquisacep}
+                onBlur={viacepSearch}
+                style={
+                  validationState.zipcode !== undefined
+                    ? { border: "1px solid red" }
+                    : {}
+                }
               />
             </div>
           </div>
 
           <div className="form-row">
             <div className="form-group col-md-8">
-              <label htmlFor="input-address">Logradouro</label>
+              <label htmlFor="address">Logradouro</label>
               <input
                 {...register("address")}
                 type="text"
                 className="form-control"
-                id="input-address"
+                id="address"
+                name="address"
                 placeholder="Ex: Rua Machado de Assis"
+                style={
+                  validationState.address !== undefined
+                    ? { border: "1px solid red" }
+                    : {}
+                }
               />
             </div>
           </div>
 
           <div className="form-row">
             <div className="form-group col-md-4">
-              <label htmlFor="input-district">Bairro</label>
+              <label htmlFor="district">Bairro</label>
               <input
                 {...register("district")}
                 type="text"
                 className="form-control"
-                id="input-district"
+                id="district"
+                name="district"
                 placeholder="Ex: Bota Fogo"
+                style={
+                  validationState.district !== undefined
+                    ? { border: "1px solid red" }
+                    : {}
+                }
               />
             </div>
 
             <div className="form-group col-md-4">
-              <label htmlFor="input-city">Cidade</label>
+              <label htmlFor="city">Cidade</label>
               <input
                 {...register("city")}
                 type="text"
                 className="form-control"
-                id="input-city"
+                id="city"
+                name="city"
                 placeholder="Ex: Mauá"
+                style={
+                  validationState.city !== undefined
+                    ? { border: "1px solid red" }
+                    : {}
+                }
               />
             </div>
           </div>
 
           <div className="form-row">
             <div className="form-group col-md-4">
-              <label htmlFor="input-state">Estado</label>
-              <select id="input-state" className="form-control">
+              <label htmlFor="state">Estado</label>
+              <select
+                id="state"
+                name="state"
+                {...register("state")}
+                className="form-control"
+                style={
+                  validationState.state !== undefined
+                    ? { border: "1px solid red" }
+                    : {}
+                }
+              >
                 <option value="">Selecione o estado...</option>
                 <option value="AC">Acre</option>
                 <option value="AL">Alagoas</option>
@@ -215,10 +418,6 @@ export function Register() {
           <button
             type="submit"
             className="btn btn-outline-success btn-rounded-seuphone"
-            onClick={(event) => {
-              event.preventDefault();
-              console.log(getValues());
-            }}
           >
             <i className="far fa-circle"></i> Cadastrar
           </button>

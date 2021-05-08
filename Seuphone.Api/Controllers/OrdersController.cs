@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -22,18 +23,31 @@ namespace Seuphone.Api.Controllers
         }
 
         // GET: api/Orders
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrder()
         {
-            return await _context.Order.Include(order => order.OrderItems)
-                .Include(order => order.User).ToListAsync();
+            
+            return await _context.Order
+                .Include(order => order.User)
+                .Include(order => order.OrderItems)
+                    .ThenInclude(orderItems => orderItems.Product)
+                        .ThenInclude(product => product.Provider)
+                .ToListAsync();
         }
 
         // GET: api/Orders/5
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<Order>> GetOrder(int id)
         {
-            var order = await _context.Order.FindAsync(id);
+            var order = await _context.Order
+                .Include(order => order.User)
+                .Include(order => order.OrderItems)
+                    .ThenInclude(orderItems => orderItems.Product)
+                        .ThenInclude(product => product.Provider)
+                .Where(order => order.OrderItems.Any(oI => oI.OrderId == id))
+                .SingleOrDefaultAsync();
 
             if (order == null)
             {
@@ -43,9 +57,30 @@ namespace Seuphone.Api.Controllers
             return order;
         }
 
+        // GET: api/Orders/5
+        [Authorize]
+        [HttpGet("user/{id}")]
+        public async Task<ActionResult<IEnumerable<Order>>> GetOrdersByUser(int id)
+        {
+
+            User user = await _context.User.FindAsync(id);
+
+            var orders = await _context.Order.Where(o => o.UserId == id)
+                .Include(o => o.OrderItems)
+                .ToListAsync();
+
+            if (orders == null)
+            {
+                return NotFound();
+            }
+
+            return orders;
+        }
+
         // PUT: api/Orders/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutOrder(int id, Order order)
         {

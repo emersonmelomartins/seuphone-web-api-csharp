@@ -23,5 +23,9 @@ namespace Seuphone.Api.Data
         public DbSet<Seuphone.Api.Models.Order> Order { get; set; }
 
         public DbSet<Seuphone.Api.Models.OrderItems> OrderItems { get; set; }
+
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {}
     }
 }

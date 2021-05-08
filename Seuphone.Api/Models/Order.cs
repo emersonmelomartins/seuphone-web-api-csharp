@@ -10,15 +10,16 @@ namespace Seuphone.Api.Models
 {
 
     [Table("tb_order")]
-    public class Order
+    public partial class Order
     {
 
 
         public int Id { get; set; }
+        public int UserId { get; set; }
         public User User { get; set; }
         public DateTime CreationDate { get; set; }
         public OrderStatus OrderStatus { get; set; }
-        public ICollection<OrderItems> OrderItems { get; set; } = new List<OrderItems>();
+        public virtual ICollection<OrderItems> OrderItems { get; set; }
 
         public Order() { }
 

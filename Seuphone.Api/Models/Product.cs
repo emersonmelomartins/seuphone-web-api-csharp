@@ -11,6 +11,7 @@ namespace Seuphone.Api.Models
     [Table("tb_product")]
     public class Product
     {
+        [Key, ForeignKey("OrderItems")]
         public int Id { get; set; }
         public string Description { get; set; }
         public string Model { get; set; }
@@ -19,6 +20,7 @@ namespace Seuphone.Api.Models
         public double Price { get; set; }
         public int StockQuantity { get; set; }
         public string Image { get; set; }
+        public int ProviderId { get; set; }
         public Provider Provider { get; set; }
 
         public Product () { }

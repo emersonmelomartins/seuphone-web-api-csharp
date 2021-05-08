@@ -5,19 +5,22 @@ using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using Seuphone.Api.Models;
+using System.Text.Json.Serialization;
 
 namespace Seuphone.Api.Models
 {
     [Table("tb_order_items")]
     public class OrderItems
     {
+        [Key]
         public int Id { get; set; }
-        public Product Product { get; set; }
         public int Quantity { get; set; }
         public double Total { get; set; }
-
-        [NotMapped]
+        public int OrderId { get; set; }
         public Order Order { get; set; }
+
+        public int ProductId { get; set; }
+        public Product Product { get; set; }
 
         public OrderItems() { }
 

@@ -35,8 +35,8 @@ namespace Seuphone.Api
         {
 
             // Disabling CORS for enable api access from react client web pages
-            services.AddCors(options => 
-            { 
+            services.AddCors(options =>
+            {
                 options.AddPolicy("CorsPolicy", builder => builder
                 .AllowAnyOrigin()
                 .AllowAnyMethod()
@@ -82,6 +82,11 @@ namespace Seuphone.Api
                     builder.MigrationsAssembly("Seuphone.Api")));
 
             services.AddScoped<SeedingService>();
+
+
+
+            services.AddControllers().AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

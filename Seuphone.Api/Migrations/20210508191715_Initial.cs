@@ -33,12 +33,14 @@ namespace Seuphone.Api.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Email = table.Column<string>(nullable: true),
-                    Password = table.Column<string>(nullable: true),
+                    Email = table.Column<string>(nullable: false),
+                    Password = table.Column<string>(nullable: false),
+                    ConfirmPassword = table.Column<string>(nullable: false),
+                    Token = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: true),
                     Genre = table.Column<string>(nullable: false),
                     BirthDate = table.Column<DateTime>(nullable: false),
-                    CPF = table.Column<string>(nullable: true),
+                    CPF = table.Column<string>(nullable: false),
                     ZipCode = table.Column<string>(nullable: true),
                     Address = table.Column<string>(nullable: true),
                     HouseNumber = table.Column<int>(nullable: false),
@@ -64,7 +66,7 @@ namespace Seuphone.Api.Migrations
                     Price = table.Column<double>(nullable: false),
                     StockQuantity = table.Column<int>(nullable: false),
                     Image = table.Column<string>(nullable: true),
-                    ProviderId = table.Column<int>(nullable: true)
+                    ProviderId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -74,7 +76,7 @@ namespace Seuphone.Api.Migrations
                         column: x => x.ProviderId,
                         principalTable: "tb_provider",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -83,7 +85,7 @@ namespace Seuphone.Api.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(nullable: true),
+                    UserId = table.Column<int>(nullable: false),
                     CreationDate = table.Column<DateTime>(nullable: false),
                     OrderStatus = table.Column<int>(nullable: false)
                 },
@@ -95,7 +97,7 @@ namespace Seuphone.Api.Migrations
                         column: x => x.UserId,
                         principalTable: "tb_user",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -104,10 +106,10 @@ namespace Seuphone.Api.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ProductId = table.Column<int>(nullable: true),
                     Quantity = table.Column<int>(nullable: false),
                     Total = table.Column<double>(nullable: false),
-                    OrderId = table.Column<int>(nullable: true)
+                    OrderId = table.Column<int>(nullable: false),
+                    ProductId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -117,13 +119,13 @@ namespace Seuphone.Api.Migrations
                         column: x => x.OrderId,
                         principalTable: "tb_order",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_tb_order_items_tb_product_ProductId",
                         column: x => x.ProductId,
                         principalTable: "tb_product",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(

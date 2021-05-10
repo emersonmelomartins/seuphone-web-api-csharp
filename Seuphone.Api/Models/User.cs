@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.Serialization;
 
 namespace Seuphone.Api.Models
 {
@@ -16,10 +17,13 @@ namespace Seuphone.Api.Models
         [Index(IsUnique = true)]
         public string Email { get; set; }
         [Required]
+        [IgnoreDataMember]
         public string Password { get; set; }
         [Required]
+        [IgnoreDataMember]
         [Compare("Password", ErrorMessage = "As senhas não coincidem.")]
         public string ConfirmPassword { get; set; }
+        [IgnoreDataMember]
         public string Token { get; set; }
 
         public string Name { get; set; }
@@ -35,6 +39,8 @@ namespace Seuphone.Api.Models
         public string District { get; set; }
         public string City { get; set; }
         public string State { get; set; }
+
+        public virtual IEnumerable<UserRole> UserRoles { get; set; }
 
 
         public User() { }

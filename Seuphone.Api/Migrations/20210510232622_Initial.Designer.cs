@@ -10,7 +10,7 @@ using Seuphone.Api.Data;
 namespace Seuphone.Api.Migrations
 {
     [DbContext(typeof(SeuphoneApiContext))]
-    [Migration("20210508191715_Initial")]
+    [Migration("20210510232622_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -146,6 +146,26 @@ namespace Seuphone.Api.Migrations
                     b.ToTable("tb_provider");
                 });
 
+            modelBuilder.Entity("Seuphone.Api.Models.Role", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RoleName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(20)")
+                        .HasMaxLength(20);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("tb_role");
+                });
+
             modelBuilder.Entity("Seuphone.Api.Models.User", b =>
                 {
                     b.Property<int>("Id")
@@ -205,6 +225,21 @@ namespace Seuphone.Api.Migrations
                     b.ToTable("tb_user");
                 });
 
+            modelBuilder.Entity("Seuphone.Api.Models.UserRole", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("tb_user_role");
+                });
+
             modelBuilder.Entity("Seuphone.Api.Models.Order", b =>
                 {
                     b.HasOne("Seuphone.Api.Models.User", "User")
@@ -234,6 +269,21 @@ namespace Seuphone.Api.Migrations
                     b.HasOne("Seuphone.Api.Models.Provider", "Provider")
                         .WithMany()
                         .HasForeignKey("ProviderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Seuphone.Api.Models.UserRole", b =>
+                {
+                    b.HasOne("Seuphone.Api.Models.Role", "Role")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Seuphone.Api.Models.User", "User")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

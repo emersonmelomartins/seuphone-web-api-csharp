@@ -13,7 +13,7 @@ namespace Seuphone.Api.Models
     public partial class Order
     {
 
-
+        [Key]
         public int Id { get; set; }
         public int UserId { get; set; }
         public User User { get; set; }

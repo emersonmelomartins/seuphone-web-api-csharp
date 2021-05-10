@@ -28,6 +28,20 @@ namespace Seuphone.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "tb_role",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RoleName = table.Column<string>(maxLength: 20, nullable: false),
+                    Description = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_tb_role", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "tb_user",
                 columns: table => new
                 {
@@ -101,6 +115,30 @@ namespace Seuphone.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "tb_user_role",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(nullable: false),
+                    RoleId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_tb_user_role", x => new { x.UserId, x.RoleId });
+                    table.ForeignKey(
+                        name: "FK_tb_user_role_tb_role_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "tb_role",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_tb_user_role_tb_user_UserId",
+                        column: x => x.UserId,
+                        principalTable: "tb_user",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "tb_order_items",
                 columns: table => new
                 {
@@ -147,6 +185,11 @@ namespace Seuphone.Api.Migrations
                 name: "IX_tb_product_ProviderId",
                 table: "tb_product",
                 column: "ProviderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_tb_user_role_RoleId",
+                table: "tb_user_role",
+                column: "RoleId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -155,10 +198,16 @@ namespace Seuphone.Api.Migrations
                 name: "tb_order_items");
 
             migrationBuilder.DropTable(
+                name: "tb_user_role");
+
+            migrationBuilder.DropTable(
                 name: "tb_order");
 
             migrationBuilder.DropTable(
                 name: "tb_product");
+
+            migrationBuilder.DropTable(
+                name: "tb_role");
 
             migrationBuilder.DropTable(
                 name: "tb_user");

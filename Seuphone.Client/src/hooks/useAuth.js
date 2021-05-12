@@ -1,6 +1,7 @@
 import { decode } from "jsonwebtoken";
 import { createContext, useContext, useState } from "react";
 import { useHistory } from "react-router";
+import { useLoading } from "./useLoading";
 import { toast } from "react-toastify";
 import api from "../services/api";
 import { UserAuthenticate } from "../services/userService";
@@ -8,20 +9,35 @@ import { UserAuthenticate } from "../services/userService";
 const AuthContext = createContext({});
 
 export function AuthProvider({ children }) {
+
   const history = useHistory();
+
+   const { setLoading } = useLoading();
 
   const [user, setUser] = useState(() => {
     const storagedUser = localStorage.getItem("@Seuphone::user");
 
     if (storagedUser) {
-      api.defaults.headers.Authorization = `Bearer ${storagedUser.token}`;
       return JSON.parse(storagedUser);
     }
 
     return null;
   });
 
+  const [token, setToken] = useState(() => {
+    const storagedToken = localStorage.getItem("@Seuphone::token");
+
+    if (storagedToken) {
+      return JSON.parse(storagedToken);
+    }
+
+    return null;
+  });
+
+     
+
   function Authenticate(form) {
+    setLoading(true);
     UserAuthenticate(form).then(
       (resp) => {
         const token = resp.data;
@@ -31,9 +47,6 @@ export function AuthProvider({ children }) {
           decodedToken: decode(token),
         };
 
-        // GetUser(userInfo.decodedToken.nameid).then((resp) => {
-        //   setUser(resp.data);
-        // });
         setUser(userInfo);
         api.defaults.headers.Authorization = `Bearer ${token}`;
 
@@ -45,16 +58,20 @@ export function AuthProvider({ children }) {
 
         localStorage.setItem("@Seuphone::token", token);
         localStorage.setItem("@Seuphone::user", JSON.stringify(userInfo));
+
+        setLoading(false);
       },
       (error) => {
         const erro = error.response.data;
         toast.error(erro);
+        setLoading(false);
       }
     );
   }
 
   function Logout() {
     setUser(null);
+    setToken(null);
     localStorage.removeItem("@Seuphone::user");
     localStorage.removeItem("@Seuphone::token");
     history.push("/login");
@@ -62,7 +79,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ signed: Boolean(user), user, Authenticate, Logout }}
+      value={{ signed: Boolean(user), user, Authenticate, Logout, token }}
     >
       {children}
     </AuthContext.Provider>

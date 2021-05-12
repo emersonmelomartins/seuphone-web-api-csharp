@@ -13,8 +13,8 @@ import { AuthProvider } from "./hooks/useAuth";
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <LoadingProvider>
+      <LoadingProvider>
+        <AuthProvider>
           <CartProvider>
             <Header />
             <GlobalStyle />
@@ -22,8 +22,8 @@ function App() {
             <ToastContainer autoClose={4000} />
             <Footer />
           </CartProvider>
-        </LoadingProvider>
-      </AuthProvider>
+        </AuthProvider>
+      </LoadingProvider>
     </BrowserRouter>
   );
 }

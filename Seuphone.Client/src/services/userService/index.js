@@ -13,4 +13,3 @@ export async function GetUser(id) {
 export async function CreateUser(form) {
   return await api.post(`/${route}`, form);
 }
-

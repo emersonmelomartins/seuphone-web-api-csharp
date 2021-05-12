@@ -1,4 +1,4 @@
-﻿ using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -26,8 +26,13 @@ namespace Seuphone.Api.Controllers
             _context = context;
         }
 
+        /// <summary>
+        ///     Autenticação do usuário no sistema
+        /// </summary>
+        /// <response code="200">O usuário foi autenticado com sucesso.</response>
+        /// <param name="model">E-mail e senha</param>
         [HttpPost("authenticate")]
-        public IActionResult Authenticate([FromBody]Authentication model)
+        public IActionResult Authenticate([FromBody] Authentication model)
         {
             var user = _userService.Authenticate(model.Email, model.Password);
             if (user == null) return BadRequest("Usuário e/ou senha incorretos.");
@@ -38,12 +43,21 @@ namespace Seuphone.Api.Controllers
         // GET: api/Users
         [Authorize]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUser()
+        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
-            return await _context.User
+            var users = await _context.User
                 .Include(user => user.UserRoles)
                     .ThenInclude(userRoles => userRoles.Role)
                 .ToListAsync();
+
+            foreach(User user in users)
+            {
+                user.Password = null;
+                user.ConfirmPassword = null;
+                user.Token = null;
+            }
+
+            return users;
         }
 
         // GET: api/Users/5
@@ -103,10 +117,37 @@ namespace Seuphone.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
-            _context.User.Add(user);
-            await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetUser", new { id = user.Id }, user);
+            try
+            {
+                var checkCPF = await _context.User.Where(u => u.CPF == user.CPF).FirstOrDefaultAsync();
+
+                var checkEmail = await _context.User.Where(u => u.Email == user.Email).FirstOrDefaultAsync();
+
+                if (checkCPF != null)
+                {
+                    return BadRequest("O CPF digitado já possui cadastro no sistema.");
+                }
+
+                if (checkEmail != null)
+                {
+                    return BadRequest("O E-mail digitado já possui cadastro no sistema.");
+                }
+
+
+                _context.User.Add(user);
+                await _context.SaveChangesAsync();
+
+                return CreatedAtAction("GetUser", new { id = user.Id }, user);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Ocorreu um erro. " + ex);
+            }
+
+
+
         }
 
         // DELETE: api/Users/5

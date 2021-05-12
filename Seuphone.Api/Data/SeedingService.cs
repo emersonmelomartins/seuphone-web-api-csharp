@@ -65,9 +65,9 @@ namespace Seuphone.Api.Data
                 "Transparente", "Não se aplica", 25.00, 0, "aqui vem a string base64", p2);
 
 
-            Order o1 = new Order(new int(), u1, new DateTime(2021, 04, 05), OrderStatus.RECEBIDO);
+            Order o1 = new Order(new int(), u1, new DateTime(2021, 04, 05), OrderStatus.RECEBIDO, 10049.99, 2);
 
-            Order o2 = new Order(new int(), u2, new DateTime(2021, 03, 22), OrderStatus.AGUARDANDO);
+            Order o2 = new Order(new int(), u2, new DateTime(2021, 03, 22), OrderStatus.AGUARDANDO, 9999.99, 1);
 
 
             OrderItems oi1 = new OrderItems(new int(), prod1, 1, 9999.99, o1);

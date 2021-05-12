@@ -15,7 +15,7 @@ namespace Seuphone.Api.Models
         [Key]
         public int Id { get; set; }
         public int Quantity { get; set; }
-        public double Total { get; set; }
+        public double SubTotal { get; set; }
         public int OrderId { get; set; }
         public Order Order { get; set; }
 
@@ -24,12 +24,12 @@ namespace Seuphone.Api.Models
 
         public OrderItems() { }
 
-        public OrderItems(int id, Product product, int quantity, double total, Order order)
+        public OrderItems(int id, Product product, int quantity, double subtotal, Order order)
         {
             Id = id;
             Product = product;
             Quantity = quantity;
-            Total = total;
+            SubTotal = subtotal;
             Order = order;
         }
     }

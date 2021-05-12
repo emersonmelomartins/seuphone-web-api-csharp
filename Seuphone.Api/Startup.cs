@@ -18,6 +18,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Seuphone.Api.IServices;
 using Seuphone.Api.Services;
+using System.Reflection;
+using System.IO;
+using Microsoft.OpenApi.Models;
 
 namespace Seuphone.Api
 {
@@ -33,6 +36,38 @@ namespace Seuphone.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            //Swagger
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Seuphone", Version = "v1" });
+
+                var securitySchema = new OpenApiSecurityScheme
+                {
+                    Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    }
+                };
+                c.AddSecurityDefinition("Bearer", securitySchema);
+
+                var securityRequirement = new OpenApiSecurityRequirement();
+                securityRequirement.Add(securitySchema, new[] { "Bearer" });
+                c.AddSecurityRequirement(securityRequirement);
+
+
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+
+                c.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
+            });
+
 
             // Disabling CORS for enable api access from react client web pages
             services.AddCors(options =>
@@ -113,6 +148,16 @@ namespace Seuphone.Api
             {
                 endpoints.MapControllers();
             });
+
+            //Swagger
+            app.UseSwagger();
+
+            app.UseSwaggerUI(c =>
+            {
+                c.RoutePrefix = string.Empty; //"swagger"
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+            });
+
         }
     }
 }

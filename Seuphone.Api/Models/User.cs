@@ -2,35 +2,37 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Runtime.Serialization;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.Serialization;
 
 namespace Seuphone.Api.Models
 {
     [Table("tb_user")]
+    
     public class User
     {
         [Key]
         public int Id { get; set; }
+
         [Required]
-        [Index(IsUnique = true)]
         public string Email { get; set; }
+
         [Required]
-        [IgnoreDataMember]
         public string Password { get; set; }
+
         [Required]
-        [IgnoreDataMember]
         [Compare("Password", ErrorMessage = "As senhas não coincidem.")]
         public string ConfirmPassword { get; set; }
+
         [IgnoreDataMember]
         public string Token { get; set; }
 
+        [Required]
         public string Name { get; set; }
         public char Genre { get; set; }
         public DateTime BirthDate { get; set; }
         [Required]
-        [Index(IsUnique = true)]
         public string CPF { get; set; }
 
         public string ZipCode { get; set; }

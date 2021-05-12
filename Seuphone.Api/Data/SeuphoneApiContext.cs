@@ -9,7 +9,7 @@ namespace Seuphone.Api.Data
 {
     public class SeuphoneApiContext : DbContext
     {
-        public SeuphoneApiContext (DbContextOptions<SeuphoneApiContext> options)
+        public SeuphoneApiContext(DbContextOptions<SeuphoneApiContext> options)
             : base(options)
         {
         }
@@ -28,7 +28,7 @@ namespace Seuphone.Api.Data
 
         public DbSet<Seuphone.Api.Models.OrderItems> OrderItems { get; set; }
 
-        
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -45,6 +45,14 @@ namespace Seuphone.Api.Data
             //    .HasOne<Role>(ur => ur.Role)
             //    .WithMany(r => r.UserRoles)
             //    .HasForeignKey(ur => ur.RoleId);
+
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
+
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.CPF)
+                .IsUnique();
         }
     }
 }

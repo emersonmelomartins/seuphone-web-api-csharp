@@ -13,14 +13,21 @@ namespace Seuphone.Api.Models
     {
         [Key, ForeignKey("Product")]
         public int Id { get; set; }
+        [Required]
         public string CompanyName { get; set; }
+        [Required]
         public string CNPJ { get; set; }
-
+        [Required]
         public string ZipCode { get; set; }
+        [Required]
         public string Address { get; set; }
+        [Required]
         public int HouseNumber { get; set; }
+        [Required]
         public string District { get; set; }
+        [Required]
         public string City { get; set; }
+        [Required]
         public string State { get; set; }
 
         public Provider() { }

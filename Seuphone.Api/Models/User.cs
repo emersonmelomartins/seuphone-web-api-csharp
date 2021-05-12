@@ -34,12 +34,17 @@ namespace Seuphone.Api.Models
         public DateTime BirthDate { get; set; }
         [Required]
         public string CPF { get; set; }
-
+        [Required]
         public string ZipCode { get; set; }
+        [Required]
         public string Address { get; set; }
+        [Required]
         public int HouseNumber { get; set; }
+        [Required]
         public string District { get; set; }
+        [Required]
         public string City { get; set; }
+        [Required]
         public string State { get; set; }
 
         public virtual IEnumerable<UserRole> UserRoles { get; set; }

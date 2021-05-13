@@ -23,7 +23,7 @@ namespace Seuphone.Api.Models
         public string Description { get; set; }
 
         [IgnoreDataMember]
-        public virtual IEnumerable<UserRole> UserRoles { get; set; }
+        public virtual List<UserRole> UserRoles { get; set; }
 
         public Role() { }
 

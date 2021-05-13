@@ -17,7 +17,6 @@ namespace Seuphone.Api.Models
         [IgnoreDataMember]
         public User User { get; set; }
 
-        [IgnoreDataMember]
         public int RoleId { get; set; }
         public Role Role { get; set; }
 

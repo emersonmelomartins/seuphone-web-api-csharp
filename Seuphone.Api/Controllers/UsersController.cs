@@ -134,6 +134,12 @@ namespace Seuphone.Api.Controllers
                     return BadRequest("O E-mail digitado já possui cadastro no sistema.");
                 }
 
+                Role role = _context.Role.Where(r => r.RoleName == "ROLE_CLIENTE").FirstOrDefault();
+
+                List<UserRole> roles = new List<UserRole>() {  };
+                roles.Add(new UserRole() { Role = role, User = user });
+
+                user.UserRoles = roles;
 
                 _context.User.Add(user);
                 await _context.SaveChangesAsync();

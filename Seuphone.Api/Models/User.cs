@@ -15,39 +15,59 @@ namespace Seuphone.Api.Models
         [Key]
         public int Id { get; set; }
 
-        [Required]
+
+        [MinLength(5, ErrorMessage = "O campo e-mail deve conter entre 5 a 40 caracteres.")]
+        [MaxLength(40, ErrorMessage = "O campo e-mail deve conter entre 5 a 40 caracteres.")]
+        [Required(ErrorMessage = "É obrigatório informar o e-mail.")]
         public string Email { get; set; }
 
-        [Required]
+        [MinLength(5, ErrorMessage = "O campo senha deve conter entre 5 a 20 caracteres.")]
+        [MaxLength(20, ErrorMessage = "O campo senha deve conter entre 5 a 20 caracteres.")]
+        [Required(ErrorMessage = "É obrigatório informar a senha.")]
         public string Password { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "É obrigatório confirmar sua senha.")]
         [Compare("Password", ErrorMessage = "As senhas não coincidem.")]
         public string ConfirmPassword { get; set; }
 
         [IgnoreDataMember]
         public string Token { get; set; }
 
-        [Required]
+        [MinLength(5, ErrorMessage = "O campo nome deve conter entre 5 a 40 caracteres.")]
+        [MaxLength(40, ErrorMessage = "O campo nome deve conter entre 5 a 40 caracteres.")]
+        [Required(ErrorMessage = "É obrigatório informar o nome.")]
         public string Name { get; set; }
+
+        [Required(ErrorMessage = "É obrigatório informar o gênero.")]
         public char Genre { get; set; }
+
+        [Required(ErrorMessage = "É obrigatório informar a data de nascimento.")]
         public DateTime BirthDate { get; set; }
-        [Required]
+
+        [MinLength(14, ErrorMessage = "O campo CPF deve conter 14 caracteres contando com pontuações.")]
+        [MaxLength(14, ErrorMessage = "O campo CPF deve conter 14 caracteres contando com pontuações.")]
+        [Required(ErrorMessage = "É obrigatório informar o CPF.")]
         public string CPF { get; set; }
-        [Required]
+
+        [Required(ErrorMessage = "É obrigatório informar o cep.")]
         public string ZipCode { get; set; }
-        [Required]
+
+        [Required(ErrorMessage = "É obrigatório informar o endereço.")]
         public string Address { get; set; }
-        [Required]
+
+        [Required(ErrorMessage = "É obrigatório informar o número da casa.")]
         public int HouseNumber { get; set; }
-        [Required]
+
+        [Required(ErrorMessage = "É obrigatório informar o bairro.")]
         public string District { get; set; }
-        [Required]
+
+        [Required(ErrorMessage = "É obrigatório informar a cidade.")]
         public string City { get; set; }
-        [Required]
+
+        [Required(ErrorMessage = "É obrigatório informar o estado.")]
         public string State { get; set; }
 
-        public virtual IEnumerable<UserRole> UserRoles { get; set; }
+        public virtual List<UserRole> UserRoles { get; set; }
 
 
         public User() { }

@@ -27,6 +27,7 @@ namespace Seuphone.Api.Models
         public double Price { get; set; }
         public int StockQuantity { get; set; }
         [Required]
+        [Column(TypeName = "varchar(MAX)")]
         public string Image { get; set; }
         public int ProviderId { get; set; }
         [Required]
@@ -34,9 +35,10 @@ namespace Seuphone.Api.Models
 
         public Product () { }
 
-        public Product(int id, string description, string model, string color, string storage, double price, int stockQuantity, string image, Provider provider)
+        public Product(int id, string productName, string description, string model, string color, string storage, double price, int stockQuantity, string image, Provider provider)
         {
             Id = id;
+            ProductName = productName;
             Description = description;
             Model = model;
             Color = color;

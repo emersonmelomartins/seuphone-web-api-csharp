@@ -23,11 +23,17 @@ namespace Seuphone.Api.Controllers
 
         // GET: api/Products
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProduct()
+        public async Task<ActionResult<IEnumerable<Product>>> GetProduct(string? productName = null)
         {
-            return await _context.Product
-                .Include(p => p.Provider)
-                .ToListAsync();
+
+            var query = from p in _context.Product select p;
+
+            if (productName != null)
+            {
+                query = query.Where(a => a.ProductName.Contains(productName) || a.Description.Contains(productName));
+            }
+
+            return await query.Include(p => p.Provider).ToListAsync();
         }
 
         // GET: api/Products/5

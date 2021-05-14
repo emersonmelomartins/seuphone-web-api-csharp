@@ -13,14 +13,14 @@ namespace Seuphone.Api.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CompanyName = table.Column<string>(nullable: true),
-                    CNPJ = table.Column<string>(nullable: true),
-                    ZipCode = table.Column<string>(nullable: true),
-                    Address = table.Column<string>(nullable: true),
+                    CompanyName = table.Column<string>(nullable: false),
+                    CNPJ = table.Column<string>(nullable: false),
+                    ZipCode = table.Column<string>(nullable: false),
+                    Address = table.Column<string>(nullable: false),
                     HouseNumber = table.Column<int>(nullable: false),
-                    District = table.Column<string>(nullable: true),
-                    City = table.Column<string>(nullable: true),
-                    State = table.Column<string>(nullable: true)
+                    District = table.Column<string>(nullable: false),
+                    City = table.Column<string>(nullable: false),
+                    State = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -47,20 +47,20 @@ namespace Seuphone.Api.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Email = table.Column<string>(nullable: false),
-                    Password = table.Column<string>(nullable: false),
+                    Email = table.Column<string>(maxLength: 40, nullable: false),
+                    Password = table.Column<string>(maxLength: 20, nullable: false),
                     ConfirmPassword = table.Column<string>(nullable: false),
                     Token = table.Column<string>(nullable: true),
-                    Name = table.Column<string>(nullable: false),
+                    Name = table.Column<string>(maxLength: 40, nullable: false),
                     Genre = table.Column<string>(nullable: false),
                     BirthDate = table.Column<DateTime>(nullable: false),
-                    CPF = table.Column<string>(nullable: false),
-                    ZipCode = table.Column<string>(nullable: true),
-                    Address = table.Column<string>(nullable: true),
+                    CPF = table.Column<string>(maxLength: 14, nullable: false),
+                    ZipCode = table.Column<string>(nullable: false),
+                    Address = table.Column<string>(nullable: false),
                     HouseNumber = table.Column<int>(nullable: false),
-                    District = table.Column<string>(nullable: true),
-                    City = table.Column<string>(nullable: true),
-                    State = table.Column<string>(nullable: true)
+                    District = table.Column<string>(nullable: false),
+                    City = table.Column<string>(nullable: false),
+                    State = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -73,13 +73,14 @@ namespace Seuphone.Api.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Description = table.Column<string>(nullable: true),
-                    Model = table.Column<string>(nullable: true),
-                    Color = table.Column<string>(nullable: true),
-                    Storage = table.Column<string>(nullable: true),
+                    ProductName = table.Column<string>(nullable: false),
+                    Description = table.Column<string>(nullable: false),
+                    Model = table.Column<string>(nullable: false),
+                    Color = table.Column<string>(nullable: false),
+                    Storage = table.Column<string>(nullable: false),
                     Price = table.Column<double>(nullable: false),
                     StockQuantity = table.Column<int>(nullable: false),
-                    Image = table.Column<string>(nullable: true),
+                    Image = table.Column<string>(type: "varchar(MAX)", nullable: false),
                     ProviderId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>

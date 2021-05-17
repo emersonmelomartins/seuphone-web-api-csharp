@@ -28,7 +28,7 @@ namespace Seuphone.Api.Models
 
         [Required(ErrorMessage = "É obrigatório confirmar sua senha.")]
         [Compare("Password", ErrorMessage = "As senhas não coincidem.")]
-        public string ConfirmPassword { get; set; }
+        public virtual string ConfirmPassword { get; set; }
 
         [IgnoreDataMember]
         public string Token { get; set; }

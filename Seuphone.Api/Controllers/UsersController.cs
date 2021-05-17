@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Seuphone.Api.Data;
+using Seuphone.Api.DTO;
 using Seuphone.Api.IServices;
 using Seuphone.Api.Models;
 
@@ -83,12 +84,12 @@ namespace Seuphone.Api.Controllers
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [Authorize]
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUserAddress(int id, User user)
+        public async Task<IActionResult> UpdateUserAddress(int id, AddressDTO user)
         {
-            if (id != user.Id)
-            {
-                return BadRequest();
-            }
+            //if (id != user.Id)
+            //{
+            //    return BadRequest();
+            //}
 
             var findUser = _context.User.Find(id);
 

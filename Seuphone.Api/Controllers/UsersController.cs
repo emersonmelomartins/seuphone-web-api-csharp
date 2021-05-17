@@ -83,30 +83,46 @@ namespace Seuphone.Api.Controllers
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [Authorize]
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(int id, User user)
+        public async Task<IActionResult> UpdateUserAddress(int id, User user)
         {
             if (id != user.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(user).State = EntityState.Modified;
+            var findUser = _context.User.Find(id);
 
-            try
+            if(findUser != null )
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UserExists(id))
+                findUser.Address = user.Address;
+                findUser.City = user.City;
+                findUser.District = user.District;
+                findUser.HouseNumber = user.HouseNumber;
+                findUser.State = user.State;
+                findUser.ZipCode = user.ZipCode;
+
+
+                _context.Entry(findUser).State = EntityState.Modified;
+
+                try
                 {
-                    return NotFound();
+                    await _context.SaveChangesAsync();
                 }
-                else
+                catch (DbUpdateConcurrencyException)
                 {
-                    throw;
+                    if (!UserExists(id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
                 }
+
             }
+
+           
 
             return NoContent();
         }

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using Seuphone.Api.Models.Enums;
+using System.Text.Json.Serialization;
+using Newtonsoft.Json.Converters;
 
 namespace Seuphone.Api.Models
 {
@@ -22,6 +22,9 @@ namespace Seuphone.Api.Models
         [Required]
         public int ContractDuration { get; set; }
         public DateTime CreationDate { get; set; }
+
+        //[JsonConverter(typeof(StringEnumConverter))]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public OrderStatus OrderStatus { get; set; }
         public virtual ICollection<OrderItems> OrderItems { get; set; }
 

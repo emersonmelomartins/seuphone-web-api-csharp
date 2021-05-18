@@ -21,6 +21,8 @@ using Seuphone.Api.Services;
 using System.Reflection;
 using System.IO;
 using Microsoft.OpenApi.Models;
+using System.Text.Json.Serialization;
+using Newtonsoft.Json.Converters;
 
 namespace Seuphone.Api
 {
@@ -44,7 +46,7 @@ namespace Seuphone.Api
 
                 var securitySchema = new OpenApiSecurityScheme
                 {
-                    Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                    Description = "JWT Authorization, exemplo: \"Authorization: Bearer {token}\"",
                     Name = "Authorization",
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.Http,
@@ -116,12 +118,22 @@ namespace Seuphone.Api
                     options.UseSqlServer(Configuration.GetConnectionString("SeuphoneApiContext"), builder =>
                     builder.MigrationsAssembly("Seuphone.Api")));
 
+
+            // auto seed db
             services.AddScoped<SeedingService>();
 
 
-
+            // json serialization for nested object
+            // enum serialization to show string value instead of index integer
             services.AddControllers().AddNewtonsoftJson(options =>
-                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+                    {
+                        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+                        options.SerializerSettings.Converters.Add(new StringEnumConverter());
+                    }
+                );
+
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

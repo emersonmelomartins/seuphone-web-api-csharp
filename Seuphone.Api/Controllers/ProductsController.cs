@@ -46,7 +46,10 @@ namespace Seuphone.Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProduct(int id)
         {
-            var product = await _context.Product.FindAsync(id);
+            var product = await _context.Product
+                .Include(p => p.Provider)
+                .Where(p => p.Id == id)
+                .SingleOrDefaultAsync();
 
             if (product == null)
             {

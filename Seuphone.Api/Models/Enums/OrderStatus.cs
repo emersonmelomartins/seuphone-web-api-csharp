@@ -4,8 +4,6 @@ using System.Text.Json.Serialization;
 
 namespace Seuphone.Api.Models.Enums
 {
-
-    [JsonConverter(typeof(StringEnumConverter))]
     public enum OrderStatus
     {
         [EnumMember(Value = "Aguardando")]

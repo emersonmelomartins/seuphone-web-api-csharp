@@ -46,7 +46,7 @@ namespace Seuphone.Api
 
                 var securitySchema = new OpenApiSecurityScheme
                 {
-                    Description = "JWT Authorization, exemplo: \"Authorization: Bearer {token}\"",
+                    Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
                     Name = "Authorization",
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.Http,

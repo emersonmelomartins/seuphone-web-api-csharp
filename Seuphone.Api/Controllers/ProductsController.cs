@@ -23,7 +23,7 @@ namespace Seuphone.Api.Controllers
 
         // GET: api/Products
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProduct(string? productName = null)
+        public async Task<ActionResult<IEnumerable<Product>>> GetProduct(string? productName = null, int limit = 0)
         {
 
             var query = from p in _context.Product select p;
@@ -31,6 +31,12 @@ namespace Seuphone.Api.Controllers
             if (productName != null)
             {
                 query = query.Where(a => a.ProductName.Contains(productName) || a.Description.Contains(productName));
+            }
+
+            if(limit != 0)
+            {
+
+                return await query.Take(limit).Include(p => p.Provider).ToListAsync();
             }
 
             return await query.Include(p => p.Provider).ToListAsync();

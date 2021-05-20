@@ -66,7 +66,10 @@ namespace Seuphone.Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
-            var user = await _context.User.FindAsync(id);
+            var user = await _context.User
+                .Include(user => user.UserRoles)
+                    .ThenInclude(userRoles => userRoles.Role)
+                .SingleOrDefaultAsync(user => user.Id == id);
 
             if (user == null)
             {

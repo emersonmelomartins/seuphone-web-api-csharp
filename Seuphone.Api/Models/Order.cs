@@ -22,9 +22,6 @@ namespace Seuphone.Api.Models
         [Required]
         public int ContractDuration { get; set; }
         public DateTime CreationDate { get; set; }
-
-        //[JsonConverter(typeof(StringEnumConverter))]
-        [JsonConverter(typeof(JsonStringEnumConverter))]
         public OrderStatus OrderStatus { get; set; }
         public virtual ICollection<OrderItems> OrderItems { get; set; }
 

@@ -77,6 +77,7 @@ namespace Seuphone.Api.Controllers
             }
 
             user.Password = null;
+            user.ConfirmPassword = null;
             user.Token = null;
 
             return user;

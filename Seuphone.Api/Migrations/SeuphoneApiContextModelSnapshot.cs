@@ -35,6 +35,12 @@ namespace Seuphone.Api.Migrations
                     b.Property<int>("OrderStatus")
                         .HasColumnType("int");
 
+                    b.Property<int>("OrderType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PaymentMethod")
+                        .HasColumnType("int");
+
                     b.Property<double>("Total")
                         .HasColumnType("float");
 

@@ -104,7 +104,9 @@ namespace Seuphone.Api.Migrations
                     Total = table.Column<double>(nullable: false),
                     ContractDuration = table.Column<int>(nullable: false),
                     CreationDate = table.Column<DateTime>(nullable: false),
-                    OrderStatus = table.Column<int>(nullable: false)
+                    OrderStatus = table.Column<int>(nullable: false),
+                    PaymentMethod = table.Column<int>(nullable: false),
+                    OrderType = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {

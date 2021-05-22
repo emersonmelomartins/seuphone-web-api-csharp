@@ -31,8 +31,8 @@ namespace Seuphone.Api.Controllers
             return await _context.Order
                 .Include(order => order.User)
                 .Include(order => order.OrderItems)
-                    .ThenInclude(orderItems => orderItems.Product)
-                        .ThenInclude(product => product.Provider)
+                    //.ThenInclude(orderItems => orderItems.Product)
+                        //.ThenInclude(product => product.Provider)
                 .ToListAsync();
         }
 
@@ -44,8 +44,8 @@ namespace Seuphone.Api.Controllers
             var order = await _context.Order
                 .Include(order => order.User)
                 .Include(order => order.OrderItems)
-                    .ThenInclude(orderItems => orderItems.Product)
-                        .ThenInclude(product => product.Provider)
+                    //.ThenInclude(orderItems => orderItems.Product)
+                        //.ThenInclude(product => product.Provider)
                 .Where(order => order.OrderItems.Any(oI => oI.OrderId == id))
                 .SingleOrDefaultAsync();
 
@@ -116,6 +116,9 @@ namespace Seuphone.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<Order>> PostOrder(Order order)
         {
+
+            var orderType = order.OrderType;
+
             _context.Order.Add(order);
             await _context.SaveChangesAsync();
 

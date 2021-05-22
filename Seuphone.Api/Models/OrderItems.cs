@@ -18,11 +18,10 @@ namespace Seuphone.Api.Models
         public int Quantity { get; set; }
         public double SubTotal { get; set; }
         public int OrderId { get; set; }
-        [Required]
         public Order Order { get; set; }
 
-        public int ProductId { get; set; }
         [Required]
+        public int ProductId { get; set; }
         public Product Product { get; set; }
 
         public OrderItems() { }

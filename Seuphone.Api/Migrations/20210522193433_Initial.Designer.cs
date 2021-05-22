@@ -10,7 +10,7 @@ using Seuphone.Api.Data;
 namespace Seuphone.Api.Migrations
 {
     [DbContext(typeof(SeuphoneApiContext))]
-    [Migration("20210519003907_Initial")]
+    [Migration("20210522193433_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -35,6 +35,12 @@ namespace Seuphone.Api.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<int>("OrderStatus")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrderType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PaymentMethod")
                         .HasColumnType("int");
 
                     b.Property<double>("Total")

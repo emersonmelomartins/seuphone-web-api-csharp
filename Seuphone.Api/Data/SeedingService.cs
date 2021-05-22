@@ -83,9 +83,13 @@ namespace Seuphone.Api.Data
 
 
 
-            Order o1 = new Order(new int(), u1, new DateTime(2021, 04, 05), OrderStatus.RECEBIDO, 10049.99, 2);
+            Order o1 = new Order(new int(), u1, new DateTime(2021, 04, 05), OrderStatus.RECEBIDO, PaymentMethod.CARNE, 10049.99, 2, OrderType.IN);
 
-            Order o2 = new Order(new int(), u2, new DateTime(2021, 03, 22), OrderStatus.AGUARDANDO, 9999.99, 1);
+            Order o2 = new Order(new int(), u1, new DateTime(2021, 04, 05), OrderStatus.RECEBIDO, PaymentMethod.CARNE, 10049.99, 2, OrderType.IN);
+
+            Order o3 = new Order(new int(), u2, new DateTime(2021, 03, 22), OrderStatus.AGUARDANDO, PaymentMethod.CARTAO_DE_CREDITO, 9999.99, 1, OrderType.OUT);
+
+            Order o4 = new Order(new int(), u2, new DateTime(2021, 03, 22), OrderStatus.AGUARDANDO, PaymentMethod.CARTAO_DE_CREDITO, 9999.99, 1, OrderType.OUT);
 
 
             OrderItems oi1 = new OrderItems(new int(), prod1, 1, 9999.99, o1);
@@ -100,7 +104,7 @@ namespace Seuphone.Api.Data
             _context.UserRole.AddRange(ur1, ur2, ur3);
             _context.Provider.AddRange(p1);
             _context.Product.AddRange(prod1, prod2, prod3, prod4, prod5);
-            _context.Order.AddRange(o1, o2);
+            _context.Order.AddRange(o1, o2, o3, o4);
             _context.OrderItems.AddRange(oi1, oi2, oi3);
 
             _context.SaveChanges();

@@ -15,26 +15,35 @@ namespace Seuphone.Api.Models
 
         [Key]
         public int Id { get; set; }
-        public int UserId { get; set; }
         [Required]
+        public int UserId { get; set; }
         public User User { get; set; }
         public double Total { get; set; }
-        [Required]
+        [Required(ErrorMessage = "É obrigatório escolher a duração do contrato.")]
+        [Range(1, 2, ErrorMessage = "É obrigatório informar entre 1 ou 2 anos de duração do contrato.")]
         public int ContractDuration { get; set; }
         public DateTime CreationDate { get; set; }
         public OrderStatus OrderStatus { get; set; }
+        [Required(ErrorMessage = "É obrigatório escolher um método de pagamento.")]
+        [Range(1, 2, ErrorMessage = "É obrigatório informar o método de pagamento entre 'Cartão de Crédito' ou 'Carnê'.")]
+        public PaymentMethod PaymentMethod { get; set; }
+        public OrderType OrderType { get; set; }
         public virtual ICollection<OrderItems> OrderItems { get; set; }
 
         public Order() { }
 
-        public Order(int id, User user, DateTime creationDate, OrderStatus orderStatus, double total, int contractDuration)
+        public Order(int id, User user, DateTime creationDate,
+            OrderStatus orderStatus, PaymentMethod paymentMethod,
+            double total, int contractDuration, OrderType orderType)
         {
             Id = id;
             User = user;
             CreationDate = creationDate;
             OrderStatus = orderStatus;
+            PaymentMethod = paymentMethod;
             Total = total;
             ContractDuration = contractDuration;
+            OrderType = orderType;
         }
     }
 }

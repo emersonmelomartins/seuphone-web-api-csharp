@@ -26,7 +26,8 @@ namespace Seuphone.Api.Controllers
         public async Task<ActionResult<IEnumerable<Product>>> GetProduct(string productName = null, int limit = 0)
         {
 
-            var query = from p in _context.Product select p;
+            var query = from p in _context.Product where p.StockQuantity > 0 select p;
+
 
             if (productName != null)
             {

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Seuphone.Api.Data;
 using Seuphone.Api.Models;
+using Seuphone.Api.Models.Enums;
 
 namespace Seuphone.Api.Controllers
 {
@@ -27,12 +28,12 @@ namespace Seuphone.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrder()
         {
-            
+
             return await _context.Order
-                .Include(order => order.User)
                 .Include(order => order.OrderItems)
-                    //.ThenInclude(orderItems => orderItems.Product)
-                        //.ThenInclude(product => product.Provider)
+                //.Include(order => order.User)
+                //.ThenInclude(orderItems => orderItems.Product)
+                //.ThenInclude(product => product.Provider)
                 .ToListAsync();
         }
 
@@ -42,10 +43,10 @@ namespace Seuphone.Api.Controllers
         public async Task<ActionResult<Order>> GetOrder(int id)
         {
             var order = await _context.Order
-                .Include(order => order.User)
                 .Include(order => order.OrderItems)
-                    //.ThenInclude(orderItems => orderItems.Product)
-                        //.ThenInclude(product => product.Provider)
+                    .ThenInclude(orderItems => orderItems.Product)
+                //.Include(order => order.User)
+                //.ThenInclude(product => product.Provider)
                 .Where(order => order.OrderItems.Any(oI => oI.OrderId == id))
                 .SingleOrDefaultAsync();
 
@@ -117,7 +118,28 @@ namespace Seuphone.Api.Controllers
         public async Task<ActionResult<Order>> PostOrder(Order order)
         {
 
-            var orderType = order.OrderType;
+            // Saída
+            if (order.OrderType == OrderType.OUT)
+            {
+                foreach (var item in order.OrderItems)
+                {
+                    var product = await _context.Product
+                        .Where(p => p.Id == item.ProductId)
+                        .SingleOrDefaultAsync();
+
+                    if (product.StockQuantity >= item.Quantity)
+                    {
+
+                        product.StockQuantity = product.StockQuantity - item.Quantity;
+
+                        _context.SaveChanges();
+                    } else
+                    {
+                        return BadRequest("Não há estoque suficiente para o produto " + product.Id + " - " + product.Description);
+                    }
+
+                }
+            }
 
             _context.Order.Add(order);
             await _context.SaveChangesAsync();

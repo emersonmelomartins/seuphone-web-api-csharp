@@ -10,7 +10,7 @@ using Seuphone.Api.Data;
 namespace Seuphone.Api.Migrations
 {
     [DbContext(typeof(SeuphoneApiContext))]
-    [Migration("20210522193433_Initial")]
+    [Migration("20210523001902_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

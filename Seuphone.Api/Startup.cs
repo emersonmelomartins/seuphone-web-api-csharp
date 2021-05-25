@@ -111,6 +111,7 @@ namespace Seuphone.Api
                 });
 
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<OrderService, OrderService>();
 
 
 
@@ -131,6 +132,7 @@ namespace Seuphone.Api
                         options.SerializerSettings.Converters.Add(new StringEnumConverter());
                     }
                 );
+
 
 
 

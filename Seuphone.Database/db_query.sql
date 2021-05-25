@@ -17,17 +17,96 @@ LOG ON
 
 USE Seuphone;
 
--- Testing
-SELECT * FROM tb_user;
-INSERT INTO tb_user VALUES('emerson25xd@gmail.com', '123456', 'Emerson Melo Martins', 'M', '05/06/1995', '123.456.789-10', '09360490', 'Av. Caetano Scila', 285, 'Vila Assis Brasil', 'Mauá', 'SP');
 
-SELECT * FROM tb_provider;
-INSERT INTO tb_provider VALUES('Empresa', '123.456.789/0001-01', '09360490', 'Logradouro', 200, 'Bairro tal', 'Cidade', 'SP');
 
-SELECT * FROM tb_product;
-INSERT INTO tb_product VALUES('Produto 1', 'Modelo tal', 'Midnight Green', '128GB', 9999.99, 'base64code', 1);
+CREATE TABLE tb_provider (
+	Id int IDENTITY(1,1) NOT NULL,
+	CompanyName VARCHAR(60) NOT NULL,
+	CNPJ VARCHAR(60) NOT NULL,
+	ZipCode VARCHAR(60) NOT NULL,
+	Address VARCHAR(60) NOT NULL,
+	HouseNumber int NOT NULL,
+	District VARCHAR(60) NOT NULL,
+	City VARCHAR(60) NOT NULL,
+	State VARCHAR(60) NOT NULL,
+	CONSTRAINT PK_tb_provider PRIMARY KEY (Id)
+)
 
-SELECT * FROM tb_order;
 
-SELECT * FROM tb_order_items;
+CREATE TABLE tb_role (
+	Id int IDENTITY(1,1) NOT NULL,
+	RoleName VARCHAR(20) NOT NULL,
+	Description VARCHAR(60) NULL,
+	CONSTRAINT PK_tb_role PRIMARY KEY (Id)
+)
 
+
+CREATE TABLE tb_user (
+	Id int IDENTITY(1,1) NOT NULL,
+	Email VARCHAR(40) NOT NULL,
+	Password VARCHAR(20) NOT NULL,
+	ConfirmPassword VARCHAR(60) NOT NULL,
+	Token VARCHAR(60) NULL,
+	Name VARCHAR(40) NOT NULL,
+	Genre VARCHAR(1) NOT NULL,
+	BirthDate datetime2(7) NOT NULL,
+	CPF VARCHAR(14) NOT NULL,
+	ZipCode VARCHAR(60) NOT NULL,
+	Address VARCHAR(60) NOT NULL,
+	HouseNumber int NOT NULL,
+	District VARCHAR(60) NOT NULL,
+	City VARCHAR(60) NOT NULL,
+	State VARCHAR(60) NOT NULL,
+	CONSTRAINT PK_tb_user PRIMARY KEY (Id)
+)
+
+
+CREATE TABLE tb_order (
+	Id int IDENTITY(1,1) NOT NULL,
+	UserId int NOT NULL,
+	Total float NOT NULL,
+	ContractDuration int NOT NULL,
+	CreationDate datetime2(7) NOT NULL,
+	OrderStatus int NOT NULL,
+	PaymentMethod int NOT NULL,
+	OrderType int NOT NULL,
+	CONSTRAINT PK_tb_order PRIMARY KEY (Id),
+	CONSTRAINT FK_tb_order_tb_user_UserId FOREIGN KEY (UserId) REFERENCES tb_user(Id)
+)
+
+
+CREATE TABLE tb_product (
+	Id int IDENTITY(1,1) NOT NULL,
+	ProductName VARCHAR(60) NOT NULL,
+	Description VARCHAR(60) NOT NULL,
+	Model VARCHAR(60) NOT NULL,
+	Color VARCHAR(60) NOT NULL,
+	Storage VARCHAR(60) NOT NULL,
+	Price float NOT NULL,
+	StockQuantity int NOT NULL,
+	[Image] varchar(MAX) NOT NULL,
+	ProviderId int NOT NULL,
+	CONSTRAINT PK_tb_product PRIMARY KEY (Id),
+	CONSTRAINT FK_tb_product_tb_provider_ProviderId FOREIGN KEY (ProviderId) REFERENCES tb_provider(Id)
+)
+
+
+CREATE TABLE tb_user_role (
+	UserId int NOT NULL,
+	RoleId int NOT NULL,
+	CONSTRAINT PK_tb_user_role PRIMARY KEY (UserId,RoleId),
+	CONSTRAINT FK_tb_user_role_tb_role_RoleId FOREIGN KEY (RoleId) REFERENCES tb_role(Id),
+	CONSTRAINT FK_tb_user_role_tb_user_UserId FOREIGN KEY (UserId) REFERENCES tb_user(Id)
+)
+
+
+CREATE TABLE tb_order_items (
+	Id int IDENTITY(1,1) NOT NULL,
+	Quantity int NOT NULL,
+	SubTotal float NOT NULL,
+	OrderId int NOT NULL,
+	ProductId int NOT NULL,
+	CONSTRAINT PK_tb_order_items PRIMARY KEY (Id),
+	CONSTRAINT FK_tb_order_items_tb_order_OrderId FOREIGN KEY (OrderId) REFERENCES tb_order(Id),
+	CONSTRAINT FK_tb_order_items_tb_product_ProductId FOREIGN KEY (ProductId) REFERENCES tb_product(Id)
+)

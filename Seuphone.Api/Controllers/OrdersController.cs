@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Seuphone.Api.Data;
 using Seuphone.Api.Models;
 using Seuphone.Api.Models.Enums;
+using Seuphone.Api.Services;
 
 namespace Seuphone.Api.Controllers
 {
@@ -17,10 +21,12 @@ namespace Seuphone.Api.Controllers
     public class OrdersController : ControllerBase
     {
         private readonly SeuphoneApiContext _context;
+        private OrderService _orderService;
 
-        public OrdersController(SeuphoneApiContext context)
+        public OrdersController(SeuphoneApiContext context, OrderService orderService)
         {
             _context = context;
+            _orderService = orderService;
         }
 
         // GET: api/Orders
@@ -56,6 +62,30 @@ namespace Seuphone.Api.Controllers
             }
 
             return order;
+        }
+
+        // GET: api/Orders/5
+        //[Authorize]
+        [HttpGet("{id}/pdf")]
+        public async Task<ActionResult<Stream>> GetOrderPDF(int id)
+        {
+            var order = await _context.Order
+                .Include(order => order.User)
+                .Include(order => order.OrderItems)
+                    .ThenInclude(orderItems => orderItems.Product)
+                //.ThenInclude(product => product.Provider)
+                .Where(order => order.OrderItems.Any(oI => oI.OrderId == id))
+                .SingleOrDefaultAsync();
+
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+
+            var pdf = _orderService.CreateOrderPDF(order);
+
+            return pdf;
         }
 
         // GET: api/Orders/5

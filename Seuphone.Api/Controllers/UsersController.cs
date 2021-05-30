@@ -194,6 +194,96 @@ namespace Seuphone.Api.Controllers
             return user;
         }
 
+        [HttpPost("admin")]
+        public async Task<ActionResult<User>> CreateUserAdm(User user)
+        {
+
+            try
+            {
+                var checkCPF = await _context.User.Where(u => u.CPF == user.CPF).FirstOrDefaultAsync();
+
+                var checkEmail = await _context.User.Where(u => u.Email == user.Email).FirstOrDefaultAsync();
+
+                if (checkCPF != null)
+                {
+                    return BadRequest("O CPF digitado já possui cadastro no sistema.");
+                }
+
+                if (checkEmail != null)
+                {
+                    return BadRequest("O E-mail digitado já possui cadastro no sistema.");
+                }
+
+                _context.User.Add(user);
+                await _context.SaveChangesAsync();
+
+                return CreatedAtAction("GetUser", new { id = user.Id }, user);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Ocorreu um erro. " + ex);
+            }
+
+        }
+
+        [Authorize]
+        [HttpPut("admin/{id}")]
+        public async Task<IActionResult> UpdateAdminUser(int id, UserEditDTO user)
+        {
+            //if (id != user.Id)
+            //{
+            //    return BadRequest();
+            //}
+
+            var findUser = _context.User.Find(id);
+
+            if (findUser != null)
+            {
+                findUser.Password = user.Password;                 
+                findUser.Address = user.Address;
+                findUser.City = user.City;
+                findUser.District = user.District;
+                findUser.HouseNumber = user.HouseNumber;
+                findUser.State = user.State;
+                findUser.ZipCode = user.ZipCode;
+                findUser.UserRoles = user.UserRoles;
+
+                //Role role = _context.Role.Where(r => r.RoleName == "ROLE_CLIENTE").FirstOrDefault();
+
+                //List<UserRole> roles = new List<UserRole>() { };
+                //roles.Add(new UserRole() { Role = user.r, User = user });
+
+                //user.UserRoles = roles;
+
+                //_context.Entry(findUser).State = EntityState.Modified;
+
+                _context.Update(findUser);
+                //_context.SaveChanges();
+
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!UserExists(id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+
+            }
+
+
+
+            return NoContent();
+        }
+
         private bool UserExists(int id)
         {
             return _context.User.Any(e => e.Id == id);

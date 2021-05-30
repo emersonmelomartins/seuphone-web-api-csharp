@@ -13,7 +13,6 @@ namespace Seuphone.Api.Models
     public class Role
     {
         [Key]
-        [IgnoreDataMember]
         public int Id { get; set; }
 
         [Required(ErrorMessage = "É obrigatório informar o nome da função.")]

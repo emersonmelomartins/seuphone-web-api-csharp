@@ -20,7 +20,7 @@ namespace Seuphone.Api.Models
         public User User { get; set; }
         public double Total { get; set; }
         [Required(ErrorMessage = "É obrigatório escolher a duração do contrato.")]
-        [Range(1, 2, ErrorMessage = "É obrigatório informar entre 1 ou 2 anos de duração do contrato.")]
+        [Range(0, 2, ErrorMessage = "É obrigatório informar entre 1 ou 2 anos de duração do contrato.")]
         public int ContractDuration { get; set; }
         public DateTime CreationDate { get; set; }
         public OrderStatus OrderStatus { get; set; }

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Seuphone.Api.Data;
 using Seuphone.Api.DTO;
+using Seuphone.Api.Helpers;
 using Seuphone.Api.IServices;
 using Seuphone.Api.Models;
 
@@ -35,7 +36,10 @@ namespace Seuphone.Api.Controllers
         [HttpPost("authenticate")]
         public IActionResult Authenticate([FromBody] Authentication model)
         {
-            var user = _userService.Authenticate(model.Email, model.Password);
+
+            var encryptedPassword = CommonMethods.WordEncrypter(model.Password);
+
+            var user = _userService.Authenticate(model.Email, encryptedPassword);
             if (user == null) return BadRequest("Usuário e/ou senha incorretos.");
             return Ok(user.Token);
         }
@@ -87,7 +91,7 @@ namespace Seuphone.Api.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [Authorize]
-        [HttpPut("{id}")]
+        [HttpPut("{id}/address")]
         public async Task<IActionResult> UpdateUserAddress(int id, AddressDTO user)
         {
             //if (id != user.Id)
@@ -155,6 +159,13 @@ namespace Seuphone.Api.Controllers
                     return BadRequest("O E-mail digitado já possui cadastro no sistema.");
                 }
 
+                var encryptedPassword = CommonMethods.WordEncrypter(user.Password);
+                var encryptedConfirmPassword = CommonMethods.WordEncrypter(user.ConfirmPassword);
+
+                user.Password = encryptedPassword;
+                user.ConfirmPassword = encryptedConfirmPassword;
+
+
                 Role role = _context.Role.Where(r => r.RoleName == "ROLE_CLIENTE").FirstOrDefault();
 
                 List<UserRole> roles = new List<UserRole>() {  };
@@ -164,6 +175,9 @@ namespace Seuphone.Api.Controllers
 
                 _context.User.Add(user);
                 await _context.SaveChangesAsync();
+
+                user.Password = null;
+                user.ConfirmPassword = null;
 
                 return CreatedAtAction("GetUser", new { id = user.Id }, user);
 

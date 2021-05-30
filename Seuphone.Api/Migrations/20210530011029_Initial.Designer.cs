@@ -10,7 +10,7 @@ using Seuphone.Api.Data;
 namespace Seuphone.Api.Migrations
 {
     [DbContext(typeof(SeuphoneApiContext))]
-    [Migration("20210524223500_Initial")]
+    [Migration("20210530011029_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -244,8 +244,8 @@ namespace Seuphone.Api.Migrations
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasColumnType("nvarchar(20)")
-                        .HasMaxLength(20);
+                        .HasColumnType("nvarchar(60)")
+                        .HasMaxLength(60);
 
                     b.Property<string>("State")
                         .IsRequired()

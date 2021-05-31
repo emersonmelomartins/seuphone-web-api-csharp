@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Threading.Tasks;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
@@ -141,40 +143,119 @@ namespace Seuphone.Api.Controllers
             return NoContent();
         }
 
-        // POST: api/Orders
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost]
+    //    [HttpPost("mail")]
+    //    public IActionResult PostMailTest()
+    //    {
+    //        var order = _context.Order
+    //.Include(order => order.User)
+    //.Include(order => order.OrderItems)
+    //    .ThenInclude(orderItems => orderItems.Product)
+    ////.ThenInclude(product => product.Provider)
+    //.Where(order => order.OrderItems.Any(oI => oI.OrderId == 1))
+    //.SingleOrDefault();
+
+    //        var pdf = _orderService.CreateOrderPDF(order);
+
+    //        try
+    //        {
+
+    //        using (MailMessage mail = new MailMessage())
+    //        {
+    //            mail.From = new MailAddress("seuphone.apple@gmail.com");
+    //            mail.To.Add("emerson25xd@gmail.com");
+    //            mail.Subject = "Testando envio de e-mail";
+    //            mail.Body = "<h1>Testando envio de e-mail</h1> <p>Esse envio foi executado com sucesso!</p>";
+    //            mail.IsBodyHtml = true;
+    //                mail.Attachments.Add(new Attachment(pdf, "file.pdf"));
+
+    //            using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
+    //            {
+    //                smtp.Credentials = new NetworkCredential("seuphone.apple@gmail.com", "MindTech1");
+    //                smtp.EnableSsl = true;
+    //                smtp.Send(mail);
+    //            }
+
+    //        }
+    //            return Ok("E-mail enviado com sucesso!");
+    //        } catch(Exception ex)
+    //        {
+    //            return BadRequest("Ocorreu um erro " + ex);
+    //        }
+    //    }
+
+            // POST: api/Orders
+            // To protect from overposting attacks, enable the specific properties you want to bind to, for
+            // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+            [HttpPost]
         public async Task<ActionResult<Order>> PostOrder(Order order)
         {
 
-            // Saída
-            if (order.OrderType == OrderType.OUT)
+            var user = _context.User.Find(order.UserId);
+            order.User = user;
+
+            try
             {
-                foreach (var item in order.OrderItems)
+                // Saída
+                if (order.OrderType == OrderType.OUT)
                 {
-                    var product = await _context.Product
-                        .Where(p => p.Id == item.ProductId)
-                        .SingleOrDefaultAsync();
-
-                    if (product.StockQuantity >= item.Quantity)
+                    foreach (var item in order.OrderItems)
                     {
+                        var product = await _context.Product
+                            .Where(p => p.Id == item.ProductId)
+                            .SingleOrDefaultAsync();
 
-                        product.StockQuantity = product.StockQuantity - item.Quantity;
+                        if (product.StockQuantity >= item.Quantity)
+                        {
 
-                        _context.SaveChanges();
-                    } else
+                            product.StockQuantity = product.StockQuantity - item.Quantity;
+
+                            // Salva retirada de estoque
+                            _context.SaveChanges();
+                        }
+                        else
+                        {
+                            return BadRequest("Não há estoque suficiente para o produto " + product.Id + " - " + product.Description);
+                        }
+
+                    }
+                }
+
+                // Salva Pedido
+                _context.Order.Add(order);
+                await _context.SaveChangesAsync();
+
+
+                // Envia e-mail
+                var pdf = _orderService.CreateOrderPDF(order);
+                using (MailMessage mail = new MailMessage())
+                {
+                    mail.From = new MailAddress("seuphone.apple@gmail.com");
+                    mail.To.Add("emerson25xd@gmail.com");
+                    mail.Subject = "Testando envio de e-mail";
+                    mail.Body = $"<h1>Pedido {order.Id} criado com sucesso!</h1> <p>Seu pedido foi criado com sucesso, " +
+                        $"em anexo você terá as informações do mesmo.</p> <p>Você pode consultar seu pedido em nosso site na seção 'Pedidos' na página 'Meus Dados'.</p>";
+                    mail.IsBodyHtml = true;
+                    mail.Attachments.Add(new Attachment(pdf, $"seuphone-pedido-{order.Id}.pdf"));
+
+                    using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
                     {
-                        return BadRequest("Não há estoque suficiente para o produto " + product.Id + " - " + product.Description);
+                        smtp.Credentials = new NetworkCredential("seuphone.apple@gmail.com", "MindTech1");
+                        smtp.EnableSsl = true;
+                        smtp.Send(mail);
                     }
 
                 }
+
+
+
+
+                return CreatedAtAction("GetOrder", new { id = order.Id }, order);
+
+            } catch(Exception ex)
+            {
+                return BadRequest("Ocorreu um erro " + ex);
             }
-
-            _context.Order.Add(order);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetOrder", new { id = order.Id }, order);
+          
         }
 
         // DELETE: api/Orders/5

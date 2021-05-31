@@ -110,8 +110,7 @@ namespace Seuphone.Api
                     };
                 });
 
-            services.AddScoped<IUserService, UserService>();
-            services.AddScoped<OrderService, OrderService>();
+
 
 
 
@@ -122,6 +121,11 @@ namespace Seuphone.Api
 
             // auto seed db
             services.AddScoped<SeedingService>();
+
+            // Add services on startup
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<OrderService, OrderService>();
+            services.AddScoped<MailService, MailService>();
 
 
             // json serialization for nested object

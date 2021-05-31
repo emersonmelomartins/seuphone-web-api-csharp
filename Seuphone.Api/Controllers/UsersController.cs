@@ -11,6 +11,7 @@ using Seuphone.Api.DTO;
 using Seuphone.Api.Helpers;
 using Seuphone.Api.IServices;
 using Seuphone.Api.Models;
+using Seuphone.Api.Services;
 
 namespace Seuphone.Api.Controllers
 {
@@ -20,12 +21,14 @@ namespace Seuphone.Api.Controllers
     {
 
         private IUserService _userService;
+        private MailService _mailService;
         private readonly SeuphoneApiContext _context;
 
-        public UsersController(IUserService userService, SeuphoneApiContext context)
+        public UsersController(IUserService userService, SeuphoneApiContext context, MailService mailService)
         {
             _userService = userService;
             _context = context;
+            _mailService = mailService;
         }
 
         /// <summary>
@@ -178,6 +181,8 @@ namespace Seuphone.Api.Controllers
 
                 user.Password = null;
                 user.ConfirmPassword = null;
+
+                _mailService.CreateUserMail(user);
 
                 return CreatedAtAction("GetUser", new { id = user.Id }, user);
 

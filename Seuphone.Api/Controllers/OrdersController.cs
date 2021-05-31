@@ -24,11 +24,13 @@ namespace Seuphone.Api.Controllers
     {
         private readonly SeuphoneApiContext _context;
         private OrderService _orderService;
+        private MailService _mailService;
 
-        public OrdersController(SeuphoneApiContext context, OrderService orderService)
+        public OrdersController(SeuphoneApiContext context, OrderService orderService, MailService mailService)
         {
             _context = context;
             _orderService = orderService;
+            _mailService = mailService;
         }
 
         // GET: api/Orders
@@ -143,46 +145,6 @@ namespace Seuphone.Api.Controllers
             return NoContent();
         }
 
-    //    [HttpPost("mail")]
-    //    public IActionResult PostMailTest()
-    //    {
-    //        var order = _context.Order
-    //.Include(order => order.User)
-    //.Include(order => order.OrderItems)
-    //    .ThenInclude(orderItems => orderItems.Product)
-    ////.ThenInclude(product => product.Provider)
-    //.Where(order => order.OrderItems.Any(oI => oI.OrderId == 1))
-    //.SingleOrDefault();
-
-    //        var pdf = _orderService.CreateOrderPDF(order);
-
-    //        try
-    //        {
-
-    //        using (MailMessage mail = new MailMessage())
-    //        {
-    //            mail.From = new MailAddress("seuphone.apple@gmail.com");
-    //            mail.To.Add("emerson25xd@gmail.com");
-    //            mail.Subject = "Testando envio de e-mail";
-    //            mail.Body = "<h1>Testando envio de e-mail</h1> <p>Esse envio foi executado com sucesso!</p>";
-    //            mail.IsBodyHtml = true;
-    //                mail.Attachments.Add(new Attachment(pdf, "file.pdf"));
-
-    //            using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
-    //            {
-    //                smtp.Credentials = new NetworkCredential("seuphone.apple@gmail.com", "MindTech1");
-    //                smtp.EnableSsl = true;
-    //                smtp.Send(mail);
-    //            }
-
-    //        }
-    //            return Ok("E-mail enviado com sucesso!");
-    //        } catch(Exception ex)
-    //        {
-    //            return BadRequest("Ocorreu um erro " + ex);
-    //        }
-    //    }
-
             // POST: api/Orders
             // To protect from overposting attacks, enable the specific properties you want to bind to, for
             // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
@@ -190,7 +152,7 @@ namespace Seuphone.Api.Controllers
         public async Task<ActionResult<Order>> PostOrder(Order order)
         {
 
-            var user = _context.User.Find(order.UserId);
+            User user = _context.User.Find(order.UserId);
             order.User = user;
 
             try
@@ -200,7 +162,7 @@ namespace Seuphone.Api.Controllers
                 {
                     foreach (var item in order.OrderItems)
                     {
-                        var product = await _context.Product
+                        Product product = await _context.Product
                             .Where(p => p.Id == item.ProductId)
                             .SingleOrDefaultAsync();
 
@@ -226,25 +188,8 @@ namespace Seuphone.Api.Controllers
 
 
                 // Envia e-mail
-                var pdf = _orderService.CreateOrderPDF(order);
-                using (MailMessage mail = new MailMessage())
-                {
-                    mail.From = new MailAddress("seuphone.apple@gmail.com");
-                    mail.To.Add("emerson25xd@gmail.com");
-                    mail.Subject = "Testando envio de e-mail";
-                    mail.Body = $"<h1>Pedido {order.Id} criado com sucesso!</h1> <p>Seu pedido foi criado com sucesso, " +
-                        $"em anexo você terá as informações do mesmo.</p> <p>Você pode consultar seu pedido em nosso site na seção 'Pedidos' na página 'Meus Dados'.</p>";
-                    mail.IsBodyHtml = true;
-                    mail.Attachments.Add(new Attachment(pdf, $"seuphone-pedido-{order.Id}.pdf"));
-
-                    using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
-                    {
-                        smtp.Credentials = new NetworkCredential("seuphone.apple@gmail.com", "MindTech1");
-                        smtp.EnableSsl = true;
-                        smtp.Send(mail);
-                    }
-
-                }
+                Stream pdf = _orderService.CreateOrderPDF(order);
+                _mailService.CreateOrderMail(order, pdf, user.Email);
 
 
 

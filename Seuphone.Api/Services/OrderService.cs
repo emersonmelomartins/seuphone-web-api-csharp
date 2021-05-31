@@ -4,11 +4,7 @@ using Microsoft.Extensions.Options;
 using Seuphone.Api.Data;
 using Seuphone.Api.Helpers;
 using Seuphone.Api.Models;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Seuphone.Api.Services
 {

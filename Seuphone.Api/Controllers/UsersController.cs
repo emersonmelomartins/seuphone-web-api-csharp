@@ -139,6 +139,114 @@ namespace Seuphone.Api.Controllers
             return NoContent();
         }
 
+                // PUT: api/Users/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to, for
+        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        [Authorize]
+        [HttpPut("{id}/password")]
+        public async Task<IActionResult> UpdateUserPassword(int id, PasswordDTO userPassword)
+        {
+
+            var findUser = _context.User.Find(id);
+
+            if(findUser != null )
+            {
+                var decryptedPassword = CommonMethods.WordDecrypter(findUser.Password);
+
+                if(userPassword.OldPassword.Equals(decryptedPassword))
+                {
+                    var encryptedNewPassword = CommonMethods.WordEncrypter(userPassword.NewPassword);
+                    var encryptedConfirmNewPassword = CommonMethods.WordEncrypter(userPassword.ConfirmNewPassword);
+
+                    findUser.Password = encryptedNewPassword;
+                    findUser.ConfirmPassword = encryptedConfirmNewPassword;
+
+                } else
+                {
+                    return BadRequest("A senha informada está incorreta.");
+                }
+
+
+                _context.Entry(findUser).State = EntityState.Modified;
+
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!UserExists(id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+
+            }
+
+           
+
+            return NoContent();
+        }
+
+        // PUT: api/Users/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to, for
+        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        [Authorize]
+        [HttpPut("{id}/password/reset")]
+        public async Task<IActionResult> ResetUserPassword(int id)
+        {
+
+            var findUser = _context.User.Find(id);
+
+            if (findUser != null)
+            {
+                string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+                int length = 7;
+                Random random = new Random();
+
+                string randomPassword = new string(Enumerable.Repeat(chars, length)
+                  .Select(s => s[random.Next(s.Length)]).ToArray()); 
+
+
+                var encryptedNewPassword = CommonMethods.WordEncrypter(randomPassword);
+                var encryptedConfirmNewPassword = CommonMethods.WordEncrypter(randomPassword);
+
+                findUser.Password = encryptedNewPassword;
+                findUser.ConfirmPassword = encryptedConfirmNewPassword;
+
+
+                _context.Entry(findUser).State = EntityState.Modified;
+
+                try
+                {
+                    await _context.SaveChangesAsync();
+
+                    _mailService.ResetUserPasswordMail(findUser, randomPassword);
+
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!UserExists(id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+
+            }
+
+
+
+            return NoContent();
+        }
+
         // POST: api/Users
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.

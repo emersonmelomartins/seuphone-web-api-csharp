@@ -93,5 +93,41 @@ namespace Seuphone.Api.Services
 
         }
 
+
+        public void ResetUserPasswordMail(User user, string newPassword)
+        {
+            try
+            {
+
+                using (MailMessage mail = new MailMessage())
+                {
+                    mail.From = new MailAddress(SenderMail);
+                    mail.To.Add(user.Email);
+                    mail.Subject = $"Seuphone - Redefinição de senha";
+                    mail.Body = $"<h1>Sua senha foi redefinida.</h1>" +
+                        $"<p>Olá, {user.Name}</p>" +
+                        $"<p>Sua senha foi redefinida.</p>" +
+                        $"<p>Sua nova senha é: <b>{newPassword}</b>.</p>" +
+                        $"<p>Recomendamos que você entre em nosso site e troque sua senha de acordo com seu gosto.</p>";
+                    mail.IsBodyHtml = true;
+
+                    using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
+                    {
+                        smtp.Credentials = new NetworkCredential(SenderMail, SenderPassword);
+                        smtp.EnableSsl = true;
+                        smtp.Send(mail);
+                    }
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+
+        }
+
     }
 }

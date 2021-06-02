@@ -196,11 +196,13 @@ namespace Seuphone.Api.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [Authorize]
-        [HttpPut("{id}/password/reset")]
-        public async Task<IActionResult> ResetUserPassword(int id)
+        [HttpPut("password/reset")]
+        public async Task<IActionResult> ResetUserPassword([FromBody]PasswordReset pr)
         {
-
-            var findUser = _context.User.Find(id);
+ 
+            var findUser = _context.User
+                .Where(u => u.Email == pr.Email)
+                .SingleOrDefault();
 
             if (findUser != null)
             {
@@ -230,7 +232,7 @@ namespace Seuphone.Api.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!UserExists(id))
+                    if (findUser == null)
                     {
                         return NotFound();
                     }

@@ -163,7 +163,7 @@ namespace Seuphone.Api.Controllers
 
                 } else
                 {
-                    return BadRequest("A senha informada está incorreta.");
+                    return BadRequest("A senha atual informada está incorreta.");
                 }
 
 
@@ -195,7 +195,6 @@ namespace Seuphone.Api.Controllers
         // PUT: api/Users/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [Authorize]
         [HttpPut("password/reset")]
         public async Task<IActionResult> ResetUserPassword([FromBody]PasswordReset pr)
         {
@@ -204,47 +203,46 @@ namespace Seuphone.Api.Controllers
                 .Where(u => u.Email == pr.Email)
                 .SingleOrDefault();
 
-            if (findUser != null)
+            if(findUser == null)
             {
-                string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-                int length = 7;
-                Random random = new Random();
-
-                string randomPassword = new string(Enumerable.Repeat(chars, length)
-                  .Select(s => s[random.Next(s.Length)]).ToArray()); 
-
-
-                var encryptedNewPassword = CommonMethods.WordEncrypter(randomPassword);
-                var encryptedConfirmNewPassword = CommonMethods.WordEncrypter(randomPassword);
-
-                findUser.Password = encryptedNewPassword;
-                findUser.ConfirmPassword = encryptedConfirmNewPassword;
-
-
-                _context.Entry(findUser).State = EntityState.Modified;
-
-                try
-                {
-                    await _context.SaveChangesAsync();
-
-                    _mailService.ResetUserPasswordMail(findUser, randomPassword);
-
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (findUser == null)
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-
+                return NotFound("E-mail de cadastro não encontrado, tente novamente.");
             }
 
+            string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            int length = 7;
+            Random random = new Random();
 
+            string randomPassword = new string(Enumerable.Repeat(chars, length)
+              .Select(s => s[random.Next(s.Length)]).ToArray());
+
+
+            var encryptedNewPassword = CommonMethods.WordEncrypter(randomPassword);
+            var encryptedConfirmNewPassword = CommonMethods.WordEncrypter(randomPassword);
+
+            findUser.Password = encryptedNewPassword;
+            findUser.ConfirmPassword = encryptedConfirmNewPassword;
+
+
+            _context.Entry(findUser).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+
+                _mailService.ResetUserPasswordMail(findUser, randomPassword);
+
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (findUser == null)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
 
             return NoContent();
         }

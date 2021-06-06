@@ -21,8 +21,8 @@ namespace Seuphone.Api.Models
         [Required(ErrorMessage = "É obrigatório informar o e-mail.")]
         public string Email { get; set; }
 
-        [MinLength(5, ErrorMessage = "O campo senha deve conter entre 5 a 20 caracteres.")]
-        [MaxLength(20, ErrorMessage = "O campo senha deve conter entre 5 a 20 caracteres.")]
+        [MinLength(5, ErrorMessage = "O campo senha deve conter entre 5 a 60 caracteres.")]
+        [MaxLength(60, ErrorMessage = "O campo senha deve conter entre 5 a 60 caracteres.")]
         [Required(ErrorMessage = "É obrigatório informar a senha.")]
         public string Password { get; set; }
 

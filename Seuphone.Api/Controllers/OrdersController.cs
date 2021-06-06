@@ -1,7 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Threading.Tasks;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using Seuphone.Api.Data;
 using Seuphone.Api.Models;
 using Seuphone.Api.Models.Enums;
+using Seuphone.Api.Services;
 
 namespace Seuphone.Api.Controllers
 {
@@ -17,10 +23,14 @@ namespace Seuphone.Api.Controllers
     public class OrdersController : ControllerBase
     {
         private readonly SeuphoneApiContext _context;
+        private OrderService _orderService;
+        private MailService _mailService;
 
-        public OrdersController(SeuphoneApiContext context)
+        public OrdersController(SeuphoneApiContext context, OrderService orderService, MailService mailService)
         {
             _context = context;
+            _orderService = orderService;
+            _mailService = mailService;
         }
 
         // GET: api/Orders
@@ -76,6 +86,30 @@ namespace Seuphone.Api.Controllers
         }
 
         // GET: api/Orders/5
+        //[Authorize]
+        [HttpGet("{id}/pdf")]
+        public async Task<ActionResult<Stream>> GetOrderPDF(int id)
+        {
+            var order = await _context.Order
+                .Include(order => order.User)
+                .Include(order => order.OrderItems)
+                    .ThenInclude(orderItems => orderItems.Product)
+                //.ThenInclude(product => product.Provider)
+                .Where(order => order.OrderItems.Any(oI => oI.OrderId == id))
+                .SingleOrDefaultAsync();
+
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+
+            var pdf = _orderService.CreateOrderPDF(order);
+
+            return pdf;
+        }
+
+        // GET: api/Orders/5
         [Authorize]
         [HttpGet("user/{id}")]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrdersByUser(int id)
@@ -128,36 +162,44 @@ namespace Seuphone.Api.Controllers
             return NoContent();
         }
 
-        // POST: api/Orders
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost]
+            // POST: api/Orders
+            // To protect from overposting attacks, enable the specific properties you want to bind to, for
+            // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+            [HttpPost]
         public async Task<ActionResult<Order>> PostOrder(Order order)
         {
 
-            // Saída
-            if (order.OrderType == OrderType.OUT)
+            User user = _context.User.Find(order.UserId);
+            order.User = user;
+
+            try
             {
-                foreach (var item in order.OrderItems)
+                // Saída
+                if (order.OrderType == OrderType.OUT)
                 {
-                    var product = await _context.Product
-                        .Where(p => p.Id == item.ProductId)
-                        .SingleOrDefaultAsync();
-
-                    if (product.StockQuantity >= item.Quantity)
+                    foreach (var item in order.OrderItems)
                     {
+                        Product product = await _context.Product
+                            .Where(p => p.Id == item.ProductId)
+                            .SingleOrDefaultAsync();
 
-                        product.StockQuantity = product.StockQuantity - item.Quantity;
+                        if (product.StockQuantity >= item.Quantity)
+                        {
 
-                        _context.SaveChanges();
-                    } else
-                    {
-                        return BadRequest("Não há estoque suficiente para o produto " + product.Id + " - " + product.Description);
+                            product.StockQuantity = product.StockQuantity - item.Quantity;
+
+                            // Salva retirada de estoque
+                            _context.SaveChanges();
+                        }
+                        else
+                        {
+                            return BadRequest("Não há estoque suficiente para o produto " + product.Id + " - " + product.Description);
+                        }
+
                     }
-
                 }
-            }
 
+            // Entrada
             if (order.OrderType == OrderType.IN)
             {
                 foreach (var item in order.OrderItems)
@@ -174,10 +216,24 @@ namespace Seuphone.Api.Controllers
                 }
             }
 
-            _context.Order.Add(order);
-            await _context.SaveChangesAsync();
+                // Salva Pedido
+                _context.Order.Add(order);
+                await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetOrder", new { id = order.Id }, order);
+                if(order.OrderType == OrderType.OUT)
+                {
+                // Envia e-mail
+                Stream pdf = _orderService.CreateOrderPDF(order);
+                _mailService.CreateOrderMail(order, pdf, user.Email);
+                }
+
+                return CreatedAtAction("GetOrder", new { id = order.Id }, order);
+
+            } catch(Exception ex)
+            {
+                return BadRequest("Ocorreu um erro " + ex);
+            }
+          
         }
 
         // DELETE: api/Orders/5

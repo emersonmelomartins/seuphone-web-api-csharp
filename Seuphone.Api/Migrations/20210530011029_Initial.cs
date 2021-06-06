@@ -48,7 +48,7 @@ namespace Seuphone.Api.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Email = table.Column<string>(maxLength: 40, nullable: false),
-                    Password = table.Column<string>(maxLength: 20, nullable: false),
+                    Password = table.Column<string>(maxLength: 60, nullable: false),
                     ConfirmPassword = table.Column<string>(nullable: false),
                     Token = table.Column<string>(nullable: true),
                     Name = table.Column<string>(maxLength: 40, nullable: false),

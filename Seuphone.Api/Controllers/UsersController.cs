@@ -8,8 +8,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Seuphone.Api.Data;
 using Seuphone.Api.DTO;
+using Seuphone.Api.Helpers;
 using Seuphone.Api.IServices;
 using Seuphone.Api.Models;
+using Seuphone.Api.Services;
 
 namespace Seuphone.Api.Controllers
 {
@@ -19,12 +21,14 @@ namespace Seuphone.Api.Controllers
     {
 
         private IUserService _userService;
+        private MailService _mailService;
         private readonly SeuphoneApiContext _context;
 
-        public UsersController(IUserService userService, SeuphoneApiContext context)
+        public UsersController(IUserService userService, SeuphoneApiContext context, MailService mailService)
         {
             _userService = userService;
             _context = context;
+            _mailService = mailService;
         }
 
         /// <summary>
@@ -35,7 +39,10 @@ namespace Seuphone.Api.Controllers
         [HttpPost("authenticate")]
         public IActionResult Authenticate([FromBody] Authentication model)
         {
-            var user = _userService.Authenticate(model.Email, model.Password);
+
+            var encryptedPassword = CommonMethods.WordEncrypter(model.Password);
+
+            var user = _userService.Authenticate(model.Email, encryptedPassword);
             if (user == null) return BadRequest("Usuário e/ou senha incorretos.");
             return Ok(user.Token);
         }
@@ -86,7 +93,7 @@ namespace Seuphone.Api.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [Authorize]
-        [HttpPut("{id}")]
+        [HttpPut("{id}/address")]
         public async Task<IActionResult> UpdateUserAddress(int id, AddressDTO user)
         {
             //if (id != user.Id)
@@ -131,6 +138,114 @@ namespace Seuphone.Api.Controllers
             return NoContent();
         }
 
+                // PUT: api/Users/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to, for
+        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        [Authorize]
+        [HttpPut("{id}/password")]
+        public async Task<IActionResult> UpdateUserPassword(int id, PasswordDTO userPassword)
+        {
+
+            var findUser = _context.User.Find(id);
+
+            if(findUser != null )
+            {
+                var decryptedPassword = CommonMethods.WordDecrypter(findUser.Password);
+
+                if(userPassword.OldPassword.Equals(decryptedPassword))
+                {
+                    var encryptedNewPassword = CommonMethods.WordEncrypter(userPassword.NewPassword);
+                    var encryptedConfirmNewPassword = CommonMethods.WordEncrypter(userPassword.ConfirmNewPassword);
+
+                    findUser.Password = encryptedNewPassword;
+                    findUser.ConfirmPassword = encryptedConfirmNewPassword;
+
+                } else
+                {
+                    return BadRequest("A senha atual informada está incorreta.");
+                }
+
+
+                _context.Entry(findUser).State = EntityState.Modified;
+
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!UserExists(id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+
+            }
+
+           
+
+            return NoContent();
+        }
+
+        // PUT: api/Users/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to, for
+        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        [HttpPut("password/reset")]
+        public async Task<IActionResult> ResetUserPassword([FromBody]PasswordReset pr)
+        {
+ 
+            var findUser = _context.User
+                .Where(u => u.Email == pr.Email)
+                .SingleOrDefault();
+
+            if(findUser == null)
+            {
+                return NotFound("E-mail de cadastro não encontrado, tente novamente.");
+            }
+
+            string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            int length = 7;
+            Random random = new Random();
+
+            string randomPassword = new string(Enumerable.Repeat(chars, length)
+              .Select(s => s[random.Next(s.Length)]).ToArray());
+
+
+            var encryptedNewPassword = CommonMethods.WordEncrypter(randomPassword);
+            var encryptedConfirmNewPassword = CommonMethods.WordEncrypter(randomPassword);
+
+            findUser.Password = encryptedNewPassword;
+            findUser.ConfirmPassword = encryptedConfirmNewPassword;
+
+
+            _context.Entry(findUser).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+
+                _mailService.ResetUserPasswordMail(findUser, randomPassword);
+
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (findUser == null)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
         // POST: api/Users
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
@@ -154,6 +269,13 @@ namespace Seuphone.Api.Controllers
                     return BadRequest("O E-mail digitado já possui cadastro no sistema.");
                 }
 
+                var encryptedPassword = CommonMethods.WordEncrypter(user.Password);
+                var encryptedConfirmPassword = CommonMethods.WordEncrypter(user.ConfirmPassword);
+
+                user.Password = encryptedPassword;
+                user.ConfirmPassword = encryptedConfirmPassword;
+
+
                 Role role = _context.Role.Where(r => r.RoleName == "ROLE_CLIENTE").FirstOrDefault();
 
                 List<UserRole> roles = new List<UserRole>() {  };
@@ -163,6 +285,11 @@ namespace Seuphone.Api.Controllers
 
                 _context.User.Add(user);
                 await _context.SaveChangesAsync();
+
+                user.Password = null;
+                user.ConfirmPassword = null;
+
+                _mailService.CreateUserMail(user);
 
                 return CreatedAtAction("GetUser", new { id = user.Id }, user);
 

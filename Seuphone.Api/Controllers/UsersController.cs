@@ -53,7 +53,6 @@ namespace Seuphone.Api.Controllers
 
             foreach(User user in users)
             {
-                user.Password = null;
                 user.ConfirmPassword = null;
                 user.Token = null;
             }
@@ -236,7 +235,10 @@ namespace Seuphone.Api.Controllers
             //    return BadRequest();
             //}
 
-            var findUser = _context.User.Find(id);
+            var findUser = _context.User
+                  .Include(user => user.UserRoles)
+                   .Where(user => user.Id == id)
+                   .SingleOrDefault();
 
             if (findUser != null)
             {
@@ -249,17 +251,23 @@ namespace Seuphone.Api.Controllers
                 findUser.ZipCode = user.ZipCode;
                 findUser.UserRoles = user.UserRoles;
 
-                //Role role = _context.Role.Where(r => r.RoleName == "ROLE_CLIENTE").FirstOrDefault();
+                var roleObject = user.UserRoles;
 
-                //List<UserRole> roles = new List<UserRole>() { };
-                //roles.Add(new UserRole() { Role = user.r, User = user });
+                List<UserRole> roles = new List<UserRole>() { };
 
-                //user.UserRoles = roles;
+                foreach (var item in roleObject)
+                {
+                    var currentRole = item.RoleId;
+                    var roleDataBase = _context.Role.Where(r => r.Id == currentRole).SingleOrDefault();
 
-                //_context.Entry(findUser).State = EntityState.Modified;
+                    roles.Add(new UserRole() { Role = roleDataBase, User = findUser });
+                }
 
+                user.UserRoles = roles;
+
+                _context.Entry(findUser).State = EntityState.Modified;
+    
                 _context.Update(findUser);
-                //_context.SaveChanges();
 
                 try
                 {

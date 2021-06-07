@@ -157,5 +157,136 @@ The SeuPhone site, o software e a documentação serão consultados coletivament
                 return output;
             }
         }
+
+
+        public Stream CreateOrderInvoicePDF(Order order)
+        {
+            using (var document = new Document(PageSize.A4, 30, 30, 15, 15))
+            {
+                var output = new MemoryStream();
+
+                var writer = PdfWriter.GetInstance(document, output);
+
+                writer.CloseStream = false;
+
+                document.Open();
+
+
+
+                Font titleFont = new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD);
+                Font regularFont = new Font(Font.FontFamily.HELVETICA, 12, Font.NORMAL);
+                Font boldFont = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
+
+                Paragraph title = new Paragraph("Nota Fiscal", titleFont);
+                title.Alignment = Element.ALIGN_CENTER;
+                document.Add(title);
+                document.Add(new Chunk("\r\n"));
+
+
+                PdfPTable tabelaInicio = new PdfPTable(5);
+                tabelaInicio.HorizontalAlignment = 1;
+                tabelaInicio.WidthPercentage = 100;
+
+                PdfPCell celula = new PdfPCell(new Phrase("Seuphone", boldFont));
+                celula.Colspan = 2;
+                celula.HorizontalAlignment = 1; // 0 = esquerda, 1 = centro, 2 = direita
+                celula.Padding = 0f;
+                celula.BorderWidth = 0f;
+                celula.BorderWidthRight = 0.5f;
+                celula.BorderWidthLeft = 0.5f;
+                celula.BorderWidthTop = 0.5f;
+                tabelaInicio.AddCell(celula);
+
+
+
+                PdfPCell celulavazia = new PdfPCell(new Phrase(""));
+                celulavazia.Colspan = 3;
+                celulavazia.BorderWidth = 0f;
+                celulavazia.BorderWidthRight = 0.5f;
+                celulavazia.BorderWidthLeft = 0.5f;
+                celulavazia.BorderWidthTop = 0.5f;
+                tabelaInicio.AddCell(celulavazia);
+
+                PdfPCell celulainfo = new PdfPCell(new Phrase("Nota Fiscal", boldFont));
+                celulainfo.Colspan = 2;
+                celulainfo.HorizontalAlignment = 1; // 0 = esquerda, 1 = centro, 2 = direita
+                celulainfo.Padding = 2f;
+                celulainfo.BorderWidth = 0f;
+                celulainfo.BorderWidthRight = 0.5f;
+                celulainfo.BorderWidthLeft = 0.5f;
+                celulainfo.BorderWidthBottom = 0.5f;
+                tabelaInicio.AddCell(celulainfo);
+
+
+                PdfPCell celulatitulo = new PdfPCell(new Phrase("Informações da Nota Fiscal"));
+                celulatitulo.Colspan = 3;
+                celulatitulo.HorizontalAlignment = 1; // 0 = esquerda, 1 = centro, 2 = direita
+                celulatitulo.Padding = 2f;
+                celulatitulo.BorderWidth = 0f;
+                celulatitulo.BorderWidthRight = 0.5f;
+                celulatitulo.BorderWidthLeft = 0.5f;
+                celulatitulo.BorderWidthBottom = 0.5f;
+                tabelaInicio.AddCell(celulatitulo);
+
+
+                PdfPCell celulanome = new PdfPCell();
+                celulanome.AddElement(new Phrase($"Nome: Fulano", regularFont));
+
+                tabelaInicio.AddCell(celulanome);
+                tabelaInicio.AddCell(celulanome);
+                tabelaInicio.AddCell(celulanome);
+                tabelaInicio.AddCell(celulanome);
+                tabelaInicio.AddCell(celulanome);
+
+
+                PdfPCell celulaitens = new PdfPCell(new Phrase("Itens", boldFont));
+                celulaitens.Colspan = 5;
+                celulaitens.HorizontalAlignment = 1; // 0 = esquerda, 1 = centro, 2 = direita
+                celulaitens.BorderWidth = 0f;
+                celulaitens.BorderWidthBottom = 0.5f;
+                celulaitens.BorderWidthRight = 0.5f;
+                celulaitens.BorderWidthLeft = 0.5f;
+                tabelaInicio.AddCell(celulaitens);
+
+
+                document.Add(tabelaInicio);
+
+
+
+                PdfPTable tabela = new PdfPTable(5);
+                tabela.HorizontalAlignment = 1;
+                tabela.WidthPercentage = 100;
+
+                tabela.AddCell(new Phrase("ID", boldFont));
+                tabela.AddCell(new Phrase("Descrição", boldFont));
+                tabela.AddCell(new Phrase("Valor", boldFont));
+                tabela.AddCell(new Phrase("Qtd.", boldFont));
+                tabela.AddCell(new Phrase("Subtotal", boldFont));
+
+                foreach (var item in order.OrderItems)
+                {
+                    tabela.AddCell(item.Id.ToString());
+                    tabela.AddCell(item.Product.Description);
+                    tabela.AddCell(item.Product.Price.ToString());
+                    tabela.AddCell(item.Quantity.ToString());
+                    tabela.AddCell(item.SubTotal.ToString());
+                }
+
+                PdfPCell total = new PdfPCell(new Phrase($"TOTAL: {order.Total}", boldFont));
+                total.Colspan = 5;
+                total.HorizontalAlignment = 2; // 0 = esquerda, 1 = centro, 2 = direita
+                tabela.AddCell(total);
+
+                document.Add(tabela);
+
+                document.Close();
+
+                output.Seek(0, SeekOrigin.Begin);
+
+                return output;
+            }
+        }
+
+
     }
 }

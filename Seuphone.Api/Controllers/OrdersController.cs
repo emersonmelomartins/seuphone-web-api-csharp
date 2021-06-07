@@ -70,7 +70,7 @@ namespace Seuphone.Api.Controllers
         }
 
         // GET: api/Orders/5
-        //[Authorize]
+        [Authorize]
         [HttpGet("{id}/pdf")]
         public async Task<ActionResult<Stream>> GetOrderPDF(int id)
         {
@@ -92,6 +92,32 @@ namespace Seuphone.Api.Controllers
 
             return pdf;
         }
+
+        // GET: api/Orders/5
+        //[Authorize]
+        [HttpGet("{id}/invoice-pdf")]
+        public async Task<ActionResult<Stream>> GetOrderInvoicePDF(int id)
+        {
+            var order = await _context.Order
+                .Include(order => order.User)
+                .Include(order => order.OrderItems)
+                    .ThenInclude(orderItems => orderItems.Product)
+                //.ThenInclude(product => product.Provider)
+                .Where(order => order.OrderItems.Any(oI => oI.OrderId == id))
+                .SingleOrDefaultAsync();
+
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+
+            var pdf = _orderService.CreateOrderInvoicePDF(order);
+
+            return pdf;
+        }
+
+
 
         // GET: api/Orders/5
         [Authorize]

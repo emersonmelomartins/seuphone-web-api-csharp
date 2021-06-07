@@ -23,7 +23,7 @@ namespace Seuphone.Api.Controllers
 
         // GET: api/Products
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProduct(string productName = null, int limit = 0)
+        public async Task<ActionResult<IEnumerable<Product>>> GetProducts(string productName = null, int limit = 0)
         {
 
             var query = from p in _context.Product where p.StockQuantity > 0 select p;

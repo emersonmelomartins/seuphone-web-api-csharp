@@ -16,8 +16,10 @@ namespace Seuphone.Api.Services
     {
         private SeuphoneApiContext _context;
         private readonly AppSettings _appSettings;
-        public string SenderMail { get; set; } = "seuphone.apple@gmail.com";
+        public string SenderMail { get; set; } = "seuphone@emersonmelomartins.dev.br";
         public string SenderPassword { get; set; } = "MindTech1";
+        public string SenderServer { get; set; } = "emersonmelomartins.dev.br";
+        public int SenderPort { get; set; } = 587;
 
 
         public MailService(IOptions<AppSettings> appSettings, SeuphoneApiContext context)
@@ -41,10 +43,11 @@ namespace Seuphone.Api.Services
                     mail.IsBodyHtml = true;
                     mail.Attachments.Add(new Attachment(pdf, $"seuphone-pedido-{order.Id}.pdf"));
 
-                    using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
+                    using (SmtpClient smtp = new SmtpClient(SenderServer, SenderPort))
                     {
+                        //smtp.UseDefaultCredentials = false;
                         smtp.Credentials = new NetworkCredential(SenderMail, SenderPassword);
-                        smtp.EnableSsl = true;
+                        //smtp.EnableSsl = true;
                         smtp.Send(mail);
                     }
 
@@ -75,10 +78,11 @@ namespace Seuphone.Api.Services
                         $"<p>Seu usuário foi criado com sucesso e agora você pode acessa-lo em nosso site.</p>";
                     mail.IsBodyHtml = true;
 
-                    using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
+                    using (SmtpClient smtp = new SmtpClient(SenderServer, SenderPort))
                     {
+                        //smtp.UseDefaultCredentials = false;
                         smtp.Credentials = new NetworkCredential(SenderMail, SenderPassword);
-                        smtp.EnableSsl = true;
+                        //smtp.EnableSsl = true;
                         smtp.Send(mail);
                     }
 
@@ -111,10 +115,11 @@ namespace Seuphone.Api.Services
                         $"<p>Recomendamos que você entre em nosso site e troque sua senha de acordo com seu gosto.</p>";
                     mail.IsBodyHtml = true;
 
-                    using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
+                    using (SmtpClient smtp = new SmtpClient(SenderServer, SenderPort))
                     {
+                        //smtp.UseDefaultCredentials = false;
                         smtp.Credentials = new NetworkCredential(SenderMail, SenderPassword);
-                        smtp.EnableSsl = true;
+                        //smtp.EnableSsl = true;
                         smtp.Send(mail);
                     }
 

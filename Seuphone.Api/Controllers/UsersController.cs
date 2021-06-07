@@ -60,6 +60,7 @@ namespace Seuphone.Api.Controllers
 
             foreach(User user in users)
             {
+                user.Password = null;
                 user.ConfirmPassword = null;
                 user.Token = null;
             }
@@ -367,9 +368,20 @@ namespace Seuphone.Api.Controllers
                    .Where(user => user.Id == id)
                    .SingleOrDefault();
 
-            if (findUser != null)
+
+                if (findUser != null)
             {
-                findUser.Password = user.Password;                 
+
+                if (user.Password != "" || user.Password != null)
+                {
+
+                    var encryptedPassword = CommonMethods.WordEncrypter(user.Password);
+
+                    user.Password = encryptedPassword;
+
+                    findUser.Password = user.Password;                 
+
+                }
                 findUser.Address = user.Address;
                 findUser.City = user.City;
                 findUser.District = user.District;

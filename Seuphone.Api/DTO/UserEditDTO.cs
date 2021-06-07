@@ -10,12 +10,8 @@ namespace Seuphone.Api.DTO
     public class UserEditDTO
     {
 
-        [MinLength(5, ErrorMessage = "O campo senha deve conter entre 5 a 20 caracteres.")]
-        [MaxLength(20, ErrorMessage = "O campo senha deve conter entre 5 a 20 caracteres.")]
-        [Required(ErrorMessage = "É obrigatório informar a senha.")]
         public string Password { get; set; }
 
-        [Required(ErrorMessage = "É obrigatório confirmar sua senha.")]
         [Compare("Password", ErrorMessage = "As senhas não coincidem.")]
         public virtual string ConfirmPassword { get; set; }
 

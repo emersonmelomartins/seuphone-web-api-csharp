@@ -12,5 +12,8 @@ namespace Seuphone.Api.Models.Enums
         [EnumMember(Value = "Recebido")]
         RECEBIDO,
 
+        [EnumMember(Value = "Cancelado")]
+        CANCELADO,
+
     }
 }

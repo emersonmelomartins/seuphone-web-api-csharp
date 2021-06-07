@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Seuphone.Api.Data;
+using Seuphone.Api.DTO;
 using Seuphone.Api.Models;
 using Seuphone.Api.Models.Enums;
 using Seuphone.Api.Services;
@@ -162,10 +163,47 @@ namespace Seuphone.Api.Controllers
             return NoContent();
         }
 
-            // POST: api/Orders
-            // To protect from overposting attacks, enable the specific properties you want to bind to, for
-            // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-            [HttpPost]
+        [Authorize]
+        [HttpPut("{id}/order-status")]
+        public async Task<IActionResult> UpdateOrderStatus(int id, [FromBody] OrderStatusDTO orderStatusDto)
+        {
+
+            var order = await _context.Order.FindAsync(id);
+
+            if(order != null)
+            {
+
+                order.OrderStatus = orderStatusDto.OrderStatus;
+
+                _context.Entry(order).State = EntityState.Modified;
+
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!OrderExists(id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+            }
+
+            return NoContent();
+            }
+
+            return NotFound();
+
+        }
+
+        // POST: api/Orders
+        // To protect from overposting attacks, enable the specific properties you want to bind to, for
+        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        [HttpPost]
         public async Task<ActionResult<Order>> PostOrder(Order order)
         {
 

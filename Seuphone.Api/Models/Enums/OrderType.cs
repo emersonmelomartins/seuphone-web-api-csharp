@@ -12,5 +12,7 @@ namespace Seuphone.Api.Models.Enums
         IN = 1,
         [EnumMember(Value = "Saída")]
         OUT = 2,
+        [EnumMember(Value = "Todos")]
+        ALL = 3,
     }
 }

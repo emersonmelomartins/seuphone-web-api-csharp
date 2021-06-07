@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Seuphone.Api.Data;
+using Seuphone.Api.DTO;
 using Seuphone.Api.Models;
 
 namespace Seuphone.Api.Controllers
@@ -34,7 +35,7 @@ namespace Seuphone.Api.Controllers
                 query = query.Where(a => a.ProductName.Contains(productName) || a.Description.Contains(productName));
             }
 
-            if(limit != 0)
+            if (limit != 0)
             {
 
                 return await query.Take(limit).Include(p => p.Provider).ToListAsync();
@@ -64,29 +65,59 @@ namespace Seuphone.Api.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutProduct(int id, Product product)
+        public async Task<IActionResult> PutProduct(int id, ProductDTO product)
         {
-            if (id != product.Id)
-            {
-                return BadRequest();
-            }
+            //if (id != product.Id)
+            //{
+            //    return BadRequest();
+            //}
 
-            _context.Entry(product).State = EntityState.Modified;
+            //_context.Entry(product).State = EntityState.Modified;
 
-            try
+            var findProduct = _context.Product
+                   .Where(product => product.Id == id)
+                   .SingleOrDefault();
+
+
+            if (findProduct != null)
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ProductExists(id))
+                if (product.Image == "" || product.Image == null)
                 {
-                    return NotFound();
                 }
                 else
                 {
-                    throw;
+                    findProduct.Image = product.Image;
                 }
+                findProduct.ProductName = product.ProductName;
+                findProduct.Description = product.Description;
+                findProduct.Model = product.Model;
+                findProduct.Color = product.Color;
+                findProduct.Storage = product.Storage;
+                findProduct.Price = product.Price;
+                findProduct.StockQuantity = product.StockQuantity;
+                findProduct.ProviderId = product.ProviderId;
+
+                _context.Entry(findProduct).State = EntityState.Modified;
+
+                _context.Update(findProduct);
+
+
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!ProductExists(id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+
             }
 
             return NoContent();
@@ -102,6 +133,7 @@ namespace Seuphone.Api.Controllers
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetProduct", new { id = product.Id }, product);
+
         }
 
         // DELETE: api/Products/5
@@ -118,6 +150,13 @@ namespace Seuphone.Api.Controllers
             await _context.SaveChangesAsync();
 
             return product;
+        }
+
+        [HttpGet("admin")]
+        public async Task<ActionResult<IEnumerable<Product>>> GetAllProducts()
+        {
+
+            return await _context.Product.Include(p => p.Provider).ToListAsync();
         }
 
         private bool ProductExists(int id)

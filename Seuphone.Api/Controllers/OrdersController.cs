@@ -37,15 +37,32 @@ namespace Seuphone.Api.Controllers
         // GET: api/Orders
         [Authorize]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Order>>> GetOrder()
+        public async Task<ActionResult<IEnumerable<Order>>> GetOrder(OrderType orderType = OrderType.ALL)
         {
 
-            return await _context.Order
-                .Include(order => order.OrderItems)
-                //.Include(order => order.User)
-                //.ThenInclude(orderItems => orderItems.Product)
-                //.ThenInclude(product => product.Provider)
-                .ToListAsync();
+            var query = from o in _context.Order select o;
+
+
+            if (orderType != OrderType.ALL)
+            {
+                query = query.Where(o => o.OrderType == orderType);
+            }
+
+            if (query == null)
+            {
+                return BadRequest("Não Houve resultado de pedidos !");
+            }
+
+            return await query.Include(o => o.OrderItems).ToListAsync();
+
+
+
+            //return await _context.Order
+            //    .Include(order => order.OrderItems)
+            //    //.Include(order => order.User)
+            //    //.ThenInclude(orderItems => orderItems.Product)
+            //    //.ThenInclude(product => product.Provider)
+            //    .ToListAsync();
         }
 
         // GET: api/Orders/5
@@ -246,17 +263,33 @@ namespace Seuphone.Api.Controllers
                     }
                 }
 
+            // Entrada
+            if (order.OrderType == OrderType.IN)
+            {
+                foreach (var item in order.OrderItems)
+                {
+                    var product = await _context.Product
+                        .Where(p => p.Id == item.ProductId)
+                        .SingleOrDefaultAsync();
+
+                        product.StockQuantity = product.StockQuantity + item.Quantity;
+
+                        _context.SaveChanges();
+                   
+
+                }
+            }
+
                 // Salva Pedido
                 _context.Order.Add(order);
                 await _context.SaveChangesAsync();
 
-
+                if(order.OrderType == OrderType.OUT)
+                {
                 // Envia e-mail
                 Stream pdf = _orderService.CreateOrderPDF(order);
                 _mailService.CreateOrderMail(order, pdf, user.Email);
-
-
-
+                }
 
                 return CreatedAtAction("GetOrder", new { id = order.Id }, order);
 

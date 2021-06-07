@@ -29,8 +29,8 @@ namespace Seuphone.Api.Models
         [Required]
         [Column(TypeName = "varchar(MAX)")]
         public string Image { get; set; }
-        public int ProviderId { get; set; }
         [Required]
+        public int ProviderId { get; set; }
         public Provider Provider { get; set; }
 
         public Product () { }

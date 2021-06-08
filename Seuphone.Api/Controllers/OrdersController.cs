@@ -87,11 +87,13 @@ namespace Seuphone.Api.Controllers
         }
 
         // GET: api/Orders/5
-        [Authorize]
+        //[Authorize]
         [HttpGet("{id}/pdf")]
         public async Task<ActionResult<Stream>> GetOrderPDF(int id)
         {
-            var order = await _context.Order
+            try
+            {
+                var order = await _context.Order
                 .Include(order => order.User)
                 .Include(order => order.OrderItems)
                     .ThenInclude(orderItems => orderItems.Product)
@@ -99,16 +101,21 @@ namespace Seuphone.Api.Controllers
                 .Where(order => order.OrderItems.Any(oI => oI.OrderId == id))
                 .SingleOrDefaultAsync();
 
-            if (order == null)
+                if (order == null)
+                {
+                    return NotFound("Não foi encontrado.");
+                }
+
+
+                var pdf = _orderService.CreateOrderPDF(order);
+
+                return pdf;
+
+            } catch(Exception ex)
             {
-                return NotFound();
+                return BadRequest("Ocorreu um erro: " + ex);
             }
-
-
-            var pdf = _orderService.CreateOrderPDF(order);
-
-            return pdf;
-        }
+                    }
 
         // GET: api/Orders/5
         //[Authorize]
@@ -144,7 +151,7 @@ namespace Seuphone.Api.Controllers
 
             User user = await _context.User.FindAsync(id);
 
-            var orders = await _context.Order.Where(o => o.UserId == id)
+            var orders = await _context.Order.Where(o => o.UserId == id && o.OrderType == OrderType.OUT)
                 .Include(o => o.OrderItems)
                 .ToListAsync();
 

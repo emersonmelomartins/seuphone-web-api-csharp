@@ -230,13 +230,30 @@ The SeuPhone site, o software e a documentação serão consultados coletivament
 
 
                 PdfPCell celulanome = new PdfPCell();
-                celulanome.AddElement(new Phrase($"Nome: Fulano", regularFont));
+                celulanome.AddElement(new Phrase($"Nome: {order.User.Name}", regularFont));
+                celulanome.Colspan = 2;
+                tabelaInicio.AddCell(celulanome);
 
-                tabelaInicio.AddCell(celulanome);
-                tabelaInicio.AddCell(celulanome);
-                tabelaInicio.AddCell(celulanome);
-                tabelaInicio.AddCell(celulanome);
-                tabelaInicio.AddCell(celulanome);
+                PdfPCell celulaemail = new PdfPCell();
+                celulaemail.AddElement(new Phrase($"E-mail: {order.User.Email}", regularFont));
+                celulaemail.Colspan = 3;
+                tabelaInicio.AddCell(celulaemail);
+
+                PdfPCell celulalogradouro = new PdfPCell();
+                celulalogradouro.AddElement(new Phrase($"Logradouro: {order.User.Address}", regularFont));
+                celulalogradouro.Colspan = 5;
+                tabelaInicio.AddCell(celulalogradouro);
+
+                PdfPCell celulainicio = new PdfPCell();
+                celulainicio.AddElement(new Phrase($"Início Contrato: {order.CreationDate}", regularFont));
+                celulainicio.Colspan = 5;
+                tabelaInicio.AddCell(celulainicio);
+
+                PdfPCell celulacontrato = new PdfPCell();
+                celulacontrato.AddElement(new Phrase($"Duração Contrato: {order.ContractDuration} ano(s)", regularFont));
+                celulacontrato.Colspan = 5;
+                tabelaInicio.AddCell(celulacontrato);
+
 
 
                 PdfPCell celulaitens = new PdfPCell(new Phrase("Itens", boldFont));

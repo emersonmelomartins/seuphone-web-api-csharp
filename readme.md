@@ -9,6 +9,16 @@ OBS: Você pode consultar tudo sobre a aplicação no documento localizado na pa
 - [2 Semestre](https://github.com/emersonmelomartins/fapen-seuphone).
 - [3 Semestre](https://github.com/emersonmelomartins/fapen-seuphone-ionic).
 
+##  Preview
+<p align="left">
+  <img src="./readme_assets/1.png" width=200 />
+  <img src="./readme_assets/2.png" width=200  />
+</p>
+<p align="left">
+  <img src="./readme_assets/3.png" width=200  />
+  <img src="./readme_assets/4.png" width=200  />
+</p>
+
 ## Demonstração
 Você pode acessar a demonstração da página acessando [este link.](https://emersonmelomartins.dev.br/)
 E também a documentação das apis [acessando aqui.](http://api.emersonmelomartins.dev.br/index.html)
@@ -89,7 +99,7 @@ http://localhost:5000
 Por padrão é criado um usuário com os seguintes dados:
 ```sh
 usuário: bob.brown@gmail.com
-senha: 123456
+senha: 654321
 
 # Ou
 

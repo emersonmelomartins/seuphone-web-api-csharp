@@ -1,5 +1,6 @@
 # Seuphone Web
 Seuphone web é uma aplicação simulando um e-commerce com diversas funcionalidades.
+OBS: Você pode consultar tudo sobre a aplicação no documento localizado na pasta "Documentação".
 
 - ⚠️ Atenção
 - Esta aplicação está divida entre BACK-END (Esta página) e FRONT-END, a outra parte você pode estar [consultando aqui](https://github.com/emersonmelomartins/seuphone-web-frontend-react)
